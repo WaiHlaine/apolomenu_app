@@ -4,6 +4,7 @@ import AddNewTableDialog from '@/components/table/AddNewTableDialog';
 import DeleteSelectedTablesDialog from '@/components/table/DeleteSelectedTableDialog';
 import DownloadAllTables from '@/components/table/DownloadAllTablesButton';
 import EditTableDialog from '@/components/table/EditTableDialog';
+import ViewQrDialog from '@/components/table/ViewQrDialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getColumns } from '@/components/ui/columns';
 import { DataTable } from '@/components/ui/data-table';
@@ -23,9 +24,6 @@ interface TableAndQrProps {
 
 export default function TableAndQr({ tables }: TableAndQrProps) {
     const [search, setSearch] = useState('');
-    console.log({
-        tables,
-    });
     const addTable = useSelectedTableStore((store) => store.addTable);
     const removeTable = useSelectedTableStore((store) => store.removeTable);
     const selectedTables = useSelectedTableStore((store) => store.tables);
@@ -39,12 +37,15 @@ export default function TableAndQr({ tables }: TableAndQrProps) {
     };
 
     const columns = getColumns<Table>({
-        renderIcon: (row) => <img src={row.qrCode} className="h-10 w-10" alt={row.name} />,
+        renderIcon: (row) => <ViewQrDialog table={row} />,
+        renderIconName: 'Qr',
         withActions: true,
         renderActions: (row) => (
             <div className="flex items-center justify-end gap-2">
                 <EditTableDialog table={row} />
-                <DownloadIcon className="cursor-pointer" />
+                <a href={route('table.qrcode.download', row.id)} target="_blank">
+                    <DownloadIcon className="cursor-pointer" />
+                </a>
             </div>
         ),
     });

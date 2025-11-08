@@ -126,7 +126,7 @@ export default function EditCategoryDialog({
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type="submit">Create category</Button>
+                        <Button type="submit">Save changes</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

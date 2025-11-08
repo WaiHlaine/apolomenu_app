@@ -29,11 +29,13 @@ export default function RequestActionsAndOrderHisotry() {
                 <Button onClick={handleTableOrdersHistoryClick} size={'icon'} className="rounded-full">
                     <Notebook />
                 </Button>
-                <div className="absolute top-[-4px] right-[-16px]">
-                    <Badge className="rounded-full" variant={'destructive'}>
-                        {activeOrderCount}
-                    </Badge>
-                </div>
+                {activeOrderCount > 0 && (
+                    <div className="absolute top-[-4px] right-[-16px]">
+                        <Badge className="rounded-full" variant={'destructive'}>
+                            {activeOrderCount}
+                        </Badge>
+                    </div>
+                )}
             </div>
         </div>
     );

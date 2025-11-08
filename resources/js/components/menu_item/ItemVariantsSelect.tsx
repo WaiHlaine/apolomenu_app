@@ -34,11 +34,13 @@ export default function ItemVariantsSelect({
                             <RadioGroupItem disabled={variant.outOfStock} value={variant.id.toString()} id={variant.id.toString()} />
                             {variant.outOfStock ? (
                                 <div className="flex items-center gap-2">
-                                    <p className="text-gray-500">{variant.name.toString()}</p>
+                                    <p className="text-gray-500 capitalize">{variant.name.toString()}</p>
                                     <Badge variant={'secondary'}>Out of stock</Badge>
                                 </div>
                             ) : (
-                                <Label htmlFor={variant.id.toString()}>{variant.name.toString()}</Label>
+                                <Label htmlFor={variant.id.toString()} className="capitalize">
+                                    {variant.name.toString()}
+                                </Label>
                             )}
                         </div>
                         <div>

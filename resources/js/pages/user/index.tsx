@@ -56,7 +56,7 @@ export default function UserListPage() {
             user.image ? <img src={user.image} alt={user.name} className="h-10 w-10 rounded-full" /> : <UserCircle2Icon size={40} />,
         withActions: true,
         renderActions: (user) => (
-            <div className="flex justify-end gap-2">
+            <div className="flex items-center justify-end gap-2">
                 <Pencil
                     className="h-4 w-4 cursor-pointer"
                     onClick={() => {
@@ -91,7 +91,7 @@ export default function UserListPage() {
                 accessorKey: 'email',
             },
             {
-                header: 'Last Update',
+                header: 'Last updated',
                 accessorKey: 'updatedAt',
                 cell: ({ row }) => new Date(row.original.updatedAt).toLocaleDateString(),
             },

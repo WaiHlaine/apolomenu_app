@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
-import { Circle } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -36,7 +36,7 @@ export default function AddNewCategoryDialog() {
         if (data.description) formData.append('description', data.description);
         if (data.image instanceof File) formData.append('image', data.image);
 
-        router.post('/menu_category', formData, {
+        router.post(route('menu_category.store'), formData, {
             onSuccess: () => {
                 form.reset();
                 setOpenDialog(false);
@@ -44,16 +44,11 @@ export default function AddNewCategoryDialog() {
         });
     };
 
-    const handleImageSlectButtonClick = () => {
-        const input = document.getElementById('image') as HTMLInputElement;
-        input.click();
-    };
-
     return (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogTrigger asChild>
                 <Button variant={'ghost'} onClick={() => setOpenDialog(true)}>
-                    <Circle size={16} />
+                    <Plus size={16} />
                     Add new category
                 </Button>
             </DialogTrigger>
@@ -88,7 +83,7 @@ export default function AddNewCategoryDialog() {
                             onChange={(e) => form.setValue('image', e.target.files?.[0])}
                         />
 
-                        {form.watch('image') instanceof File ? (
+                        {/* {form.watch('image') instanceof File ? (
                             // ✅ New uploaded file → show preview
                             <div onClick={handleImageSlectButtonClick} className="flex items-center justify-center">
                                 <img
@@ -98,10 +93,11 @@ export default function AddNewCategoryDialog() {
                                 />
                             </div>
                         ) : (
-                            <div>
-                                <ImageUpload onSelect={handleImageSlectButtonClick} />
-                            </div>
-                        )}
+                            
+                        )} */}
+                        <div>
+                            <ImageUpload value={form.watch('image')} onSelect={(value) => form.setValue('image', value)} />
+                        </div>
 
                         {form.formState.errors.image && <p className="text-xs text-red-500">{form.formState.errors.image.message as string}</p>}
                     </div>

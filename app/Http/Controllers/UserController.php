@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SessionKeys;
 use App\Http\Requests\User\CreateUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\RoleResource;
 use App\Http\Resources\UserResource;
+use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,7 +48,8 @@ class UserController extends Controller
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $users = $query->paginate(10)->withQueryString();
+        $users = $query
+            ->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         return Inertia::render('user/index', [
             'users' => UserResource::collection($users),
@@ -58,8 +61,9 @@ class UserController extends Controller
     public function store(CreateUserRequest $request)
     {
         $validated = $request->validated();
+        $branch = Branch::where('id', session(SessionKeys::CURRENT_BRANCH_ID))->first();
 
-        return DB::transaction(function () use ($request, $validated) {
+        return DB::transaction(function () use ($request, $validated, $branch) {
             // Step 1: Create user without image
             $user = User::create([
                 'name' => $validated['name'],
@@ -69,6 +73,7 @@ class UserController extends Controller
 
             // Step 2: Sync roles
             $user->roles()->sync($validated['roles']);
+            $branch->users()->attach($user->id);
 
             // Step 3: If an image was uploaded, store and update user
             if ($request->hasFile('image')) {

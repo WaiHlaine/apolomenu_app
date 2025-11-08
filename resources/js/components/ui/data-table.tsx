@@ -23,6 +23,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   enableRowSelection?: boolean;
   onSelectionChange?: (selected: TData[]) => void;
+  onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -30,6 +31,7 @@ export function DataTable<TData, TValue>({
   data,
   enableRowSelection = false,
   onSelectionChange,
+  onRowClick
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
@@ -92,7 +94,7 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+              <TableRow onClick={() => onRowClick?.(row.original)} className="p-4 cursor-pointer" key={row.id} data-state={row.getIsSelected() && "selected"}>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

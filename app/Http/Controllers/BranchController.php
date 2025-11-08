@@ -77,11 +77,11 @@ class BranchController extends Controller
         ]);
     }
 
-    public function financeSetting()
+    public function vatCurrencyLanguageSetting()
     {
         $branch = Branch::with('languages')->where('id', session(SessionKeys::CURRENT_BRANCH_ID))->first();
 
-        return Inertia::render('restaurant/settings/finance', [
+        return Inertia::render('restaurant/settings/vat_currency_language', [
             'branch' => BranchResource::make($branch),
             'languages' => LanguageResource::collection(Language::all()),
         ]);
@@ -147,7 +147,7 @@ class BranchController extends Controller
             ->with('success', 'Restaurant location updated successfully.');
     }
 
-    public function updateFinance(UpdateBranchRequest $request)
+    public function updateVatCurrencyLanguageSetting(UpdateBranchRequest $request)
     {
         $validated = $request->validated();
         $branch = $request->user()->currentBranch();

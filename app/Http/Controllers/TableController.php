@@ -44,7 +44,6 @@ class TableController extends Controller
     public function store(StoreTableRequest $request)
     {
         $validated = $request->validated();
-
         $branchId = session(SessionKeys::CURRENT_BRANCH_ID);
         $branch = Branch::with('tenant')->findOrFail($branchId);
 
@@ -56,12 +55,16 @@ class TableController extends Controller
 
         $qrString = config('app.url').'/'.$table->branch->tenant_id.'/'.$branch->id.'/'.$table->public_token.'/menus';
 
+        // Ensure directory exists
+        Storage::disk('public')->makeDirectory('tables/qrcodes');
+
         $qrPath = 'tables/qrcodes/'.uniqid().'.svg';
 
-        Storage::disk('public')->put($qrPath, QrCode::format('svg')->size(300)->generate($qrString));
+        $svg = QrCode::format('svg')->size(300)->generate($qrString);
+        Storage::disk('public')->put($qrPath, $svg);
 
         $table->update([
-            'qr_code' => Storage::url($qrPath),
+            'qr_code' => $qrPath, // store relative path, not URL
         ]);
 
         return redirect()
@@ -107,22 +110,18 @@ class TableController extends Controller
     {
         $validated = $request->validated();
 
-        DB::beginTransaction();
-        try {
-            Table::whereIn('id', $validated['tables'])->delete();
+        DB::transaction(function () use ($validated) {
+            $tables = Table::whereIn('id', $validated['tables'])->get();
 
-            DB::commit();
+            foreach ($tables as $table) {
+                if ($table->qr_code && Storage::disk('public')->exists($table->qr_code)) {
+                    Storage::disk('public')->delete($table->qr_code);
+                }
+                $table->delete();
+            }
+        });
 
-            return redirect()
-                ->back()
-                ->with('success', 'Selected tables deleted successfully.');
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            return redirect()
-                ->back()
-                ->withErrors(['error' => 'Failed to delete tables: '.$e->getMessage()]);
-        }
+        return redirect()->back()->with('success', 'Selected tables deleted successfully.');
     }
 
     public function downloadQRCodes(Request $request)
@@ -132,36 +131,63 @@ class TableController extends Controller
             'tables.*' => 'exists:tables,id',
         ]);
 
-        $tables = Table::whereIn('id', $validated['tables'])
-            ->with('branch.tenant')
-            ->get();
-
-        $tempDir = storage_path('app/temp_qrcodes_'.uniqid());
-        File::makeDirectory($tempDir);
-
-        foreach ($tables as $table) {
-            $qrString = config('app.url').'/'.$table->branch->tenant_id.'/'.$table->branch_id.'/'.$table->id.'/menu';
-            $filePath = $tempDir."/table_{$table->id}.svg";
-
-            QrCode::format('svg')
-                ->size(300)
-                ->generate($qrString, $filePath);
-        }
+        $tables = Table::whereIn('id', $validated['tables'])->get();
 
         $zipFileName = 'qrcodes_'.now()->format('Ymd_His').'.zip';
         $zipFilePath = storage_path('app/'.$zipFileName);
 
         $zip = new \ZipArchive;
-        if ($zip->open($zipFilePath, \ZipArchive::CREATE) === true) {
-            foreach (File::files($tempDir) as $file) {
-                $zip->addFile($file->getPathname(), $file->getFilename());
-            }
-            $zip->close();
+        if ($zip->open($zipFilePath, \ZipArchive::CREATE) !== true) {
+            abort(500, 'Could not create ZIP file.');
         }
 
-        // cleanup: delete folder and files
-        File::deleteDirectory($tempDir);
+        foreach ($tables as $table) {
+            $svgPath = storage_path('app/public/'.str_replace('/storage/', '', $table->qr_code));
+            $pngFileName = "{$table->name}.png";
+
+            if (! File::exists($svgPath)) {
+                continue; // skip missing SVGs
+            }
+
+            $pngContent = shell_exec('rsvg-convert -w 300 -h 300 '.escapeshellarg($svgPath));
+
+            if ($pngContent) {
+                $zip->addFromString($pngFileName, $pngContent);
+            }
+        }
+
+        $zip->close();
+
+        if (! File::exists($zipFilePath)) {
+            abort(500, 'ZIP file was not created.');
+        }
 
         return response()->download($zipFilePath)->deleteFileAfterSend(true);
+    }
+
+    public function downloadSingleQRCode($id)
+    {
+        $table = Table::findOrFail($id);
+
+        // Build path to the stored SVG
+        $svgPath = storage_path('app/public/'.str_replace('/storage/', '', $table->qr_code));
+
+        if (! File::exists($svgPath)) {
+            abort(404, 'QR code file not found.');
+        }
+
+        // Convert SVG to PNG
+        $pngContent = shell_exec('rsvg-convert -w 300 -h 300 '.escapeshellarg($svgPath));
+
+        if (! $pngContent) {
+            abort(500, 'Failed to convert QR code.');
+        }
+
+        // Save temporarily for download
+        $pngFileName = "{$table->name}.png";
+        $tmpPath = storage_path("app/{$pngFileName}");
+        File::put($tmpPath, $pngContent);
+
+        return response()->download($tmpPath)->deleteFileAfterSend(true);
     }
 }

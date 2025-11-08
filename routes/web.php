@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return redirect(route('login'));
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -28,3 +28,5 @@ require __DIR__.'/kitchen.php';
 require __DIR__.'/order_cart.php';
 require __DIR__.'/order.php';
 require __DIR__.'/table_request_action.php';
+require __DIR__.'/admin.php';
+require __DIR__.'/cashier.php';

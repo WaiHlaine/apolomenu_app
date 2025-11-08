@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SessionKeys;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Table extends Model
@@ -25,6 +26,7 @@ class Table extends Model
         static::creating(function ($table) {
             $table->branch_id = session(SessionKeys::CURRENT_BRANCH_ID);
         });
+        static::addGlobalScope(new BranchScope);
     }
 
     public function requests()

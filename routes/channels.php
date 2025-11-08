@@ -9,3 +9,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('branch.{branchId}.orders', function ($user, $branchId) {
     return $user->branches()->where('branches.id', $branchId)->exists();
 });
+
+Broadcast::channel('branch.{branchId}.table_request_actions', function ($user, $branchId) {
+    return $user->branches()->where('branches.id', $branchId)->exists();
+});

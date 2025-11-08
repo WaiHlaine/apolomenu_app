@@ -129,8 +129,6 @@ export default function EditUserDialog() {
                             onChange={(e) => form.setValue('image', e.target.files?.[0])}
                         />
 
-                        {JSON.stringify(form.watch('image') instanceof File)}
-
                         {form.watch('image') instanceof File ? (
                             // ✅ New uploaded file → show preview
                             <div onClick={handleImageSelectButtonClick} className="flex items-center justify-center">
@@ -168,7 +166,7 @@ export default function EditUserDialog() {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type="submit">Update</Button>
+                        <Button type="submit">Save changes</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import ImageUpload from '../ImageUpload';
+import { Textarea } from '../ui/textarea';
 import { useMenuItemUpdateStore } from './store/useUpdateMenuItemStore';
 
 type Variant = { name: string; price: string };
@@ -182,7 +183,7 @@ export default function EditMenuItemDialog() {
                         <Label htmlFor="description">
                             Description <span className="text-muted-foreground">(Optional)</span>
                         </Label>
-                        <Input id="description" {...form.register('description')} />
+                        <Textarea id="description" {...form.register('description')} />
                         {form.formState.errors.description && <p className="text-xs text-red-500">{form.formState.errors.description.message}</p>}
                     </div>
 

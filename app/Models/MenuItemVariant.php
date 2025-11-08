@@ -21,4 +21,9 @@ class MenuItemVariant extends Model
     {
         return $this->belongsTo(MenuItem::class);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'variant_id');
+    }
 }

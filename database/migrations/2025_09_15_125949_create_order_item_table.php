@@ -24,6 +24,7 @@ return new class extends Migration
                 'ready',       // finished, waiting to serve/deliver
                 'served',      // served to table / handed to customer
                 'cancelled',   // item cancelled
+                'completed',   // item completed
             ])->default('pending');
             $table->decimal('unit_price', 10, 2);   // price per item
             $table->integer('quantity')->default(1);           // number of units

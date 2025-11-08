@@ -16,6 +16,8 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasRoles,Notifiable;
 
+    protected $with = ['roles'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -77,8 +79,8 @@ class User extends Authenticatable
 
     public static function booted()
     {
-        static::created(function ($user) {
-            $user->branches()->sync([session(SessionKeys::CURRENT_BRANCH_ID)]);
-        });
+        // static::created(function ($user) {
+        //     $user->branches()->sync([session(SessionKeys::CURRENT_BRANCH_ID)]);
+        // });
     }
 }

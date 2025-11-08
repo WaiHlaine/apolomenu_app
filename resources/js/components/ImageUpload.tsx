@@ -1,16 +1,15 @@
 import { Circle } from 'lucide-react';
 import { Input } from './ui/input';
 
-export default function ImageUpload({ onSelect, value }: { onSelect: (value?: File) => void; value?: File }) {
+export default function ImageUpload({ onSelect, value, id }: { onSelect: (value?: File) => void; value?: File; id?: string }) {
     console.log({ value });
     const handleImageSlectButtonClick = () => {
-        const input = document.getElementById('image') as HTMLInputElement;
+        const input = document.getElementById(id || 'image') as HTMLInputElement;
         input.click();
     };
-    console.log('rendering image upload...');
     return (
         <div>
-            <Input className="hidden" id="image" type="file" accept="image/*" onChange={(e) => onSelect(e.target.files?.[0])} />
+            <Input className="hidden" id={id || 'image'} type="file" accept="image/*" onChange={(e) => onSelect(e.target.files?.[0])} />
 
             {value ? (
                 <div onClick={handleImageSlectButtonClick} className="flex items-center justify-center">

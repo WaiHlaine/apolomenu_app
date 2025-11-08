@@ -6,6 +6,7 @@ export type Table = {
     qrCode: string;
     branch?: Branch;
     publicToken?: string;
+    status?: string;
     tenantId: number;
     createdAt: string;
     updatedAt: string;

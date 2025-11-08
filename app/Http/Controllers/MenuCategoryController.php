@@ -24,7 +24,16 @@ class MenuCategoryController extends Controller
         // get the first category and redirect to it
         $category = MenuCategory::first();
 
+        if (! $category) {
+            return redirect()->route('menu_category.create');
+        }
+
         return redirect()->route('menu_category.show', ['id' => $category->id]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('menu_category/create');
     }
 
     public function store(CreateMenuCategoryRequest $request)

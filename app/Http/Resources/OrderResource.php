@@ -31,8 +31,11 @@ class OrderResource extends JsonResource
             'discount' => $this->discount,
             'tax' => $this->tax,
             'total' => $this->total,
+            'quantity' => $this->quantity,
             'orderSource' => $this->order_source,
             'orderNumber' => $this->order_number,
+            'paidAt' => $this->paid_at,
+            'vatRate' => $this->vat_rate,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
 

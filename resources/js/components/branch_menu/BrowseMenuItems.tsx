@@ -11,19 +11,27 @@ import ImageView from '../ImageView';
 import AddToCartButton from '../menu_item/AddToCartButton';
 import ItemBadges from '../menu_item/ItemBadges';
 import ItemPrices from '../menu_item/ItemPrices';
+import { Badge } from '../ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 
 export default function BrowseMenuItems() {
-    const { menuItems, branch, category } = usePage<{
+    const { menuItems, branch, category, list_view } = usePage<{
         menuItems: MenuItem[];
         branch: Branch;
         category: MenuCategory;
+        list_view: string;
     }>().props;
 
-    const [tab, setTab] = useState('grid');
+    const [tab, setTab] = useState(list_view);
 
     const handleTabChange = (value: string) => {
         setTab(value);
+        router.reload({
+            data: {
+                list_view: value,
+            },
+            only: ['menu_items'],
+        });
     };
 
     return (
@@ -73,7 +81,6 @@ const MenuItemItem = ({ item, currency }: { item: MenuItem; currency: string }) 
         table: Table;
         branch: Branch;
     }>().props;
-    console.log({ branch });
     const handleItemClick = () => {
         router.visit(
             route('menu_item.show', {
@@ -85,18 +92,23 @@ const MenuItemItem = ({ item, currency }: { item: MenuItem; currency: string }) 
         );
     };
     return (
-        <div className="flex w-full cursor-pointer items-start gap-4 py-4" onClick={handleItemClick}>
+        <div className={twMerge('flex w-full cursor-pointer items-start gap-4 py-4', item.outOfStock ? 'opacity-50' : '')} onClick={handleItemClick}>
             <div className="relative flex-shrink-0">
                 <ImageView className="h-[120px] w-[120px] rounded-lg" src={item.image} alt={item.translations[0]?.name} />
                 {item.outOfStock ? (
-                    <div className="absolute right-0 bottom-0 left-0">
-                        <span className="text-xs">out of stock</span>
+                    <div className="absolute right-0 bottom-0 left-0 p-2">
+                        <Badge className="capitalize" variant={'destructive'}>
+                            out of stock
+                        </Badge>
                     </div>
                 ) : (
                     <div className="absolute right-0 bottom-0 pr-1 pb-1">{item.variants.length == 1 && <AddToCartButton menuItem={item} />}</div>
                 )}
+                <div className="absolute top-0 left-0 p-2">
+                    <ItemBadges badges={item.badges} />
+                </div>
             </div>
-            <div className="flex-grow border-b pb-4">
+            <div className="flex min-h-[120px] flex-grow flex-col justify-between self-baseline border-b pb-4">
                 <div>
                     <p className="text-lg font-bold">{item.translations[0]?.name}</p>
                     <p className="text-gray-500">{item.translations[0]?.description}</p>
@@ -104,9 +116,6 @@ const MenuItemItem = ({ item, currency }: { item: MenuItem; currency: string }) 
                 <div className="mt-2 flex items-center justify-between">
                     <div>
                         <ItemPrices variants={item.variants} currency={currency} />
-                    </div>
-                    <div>
-                        <ItemBadges badges={item.badges} />
                     </div>
                 </div>
             </div>
@@ -126,15 +135,27 @@ const DynamicBottomSpacing = () => {
 };
 
 const GridLayoutMenuItems = ({ items, currency }: { items: MenuItem[]; currency: string }) => {
+    const { table, branch } = usePage<{
+        table: Table;
+        branch: Branch;
+    }>().props;
+
     const handleItemClick = (item: MenuItem) => {
-        router.visit(route('menu_item.show', { id: item.id }));
+        router.visit(
+            route('menu_item.show', {
+                tenant_id: branch.tenantId,
+                branch_id: branch.id,
+                table_public_token: table.publicToken,
+                id: item.id,
+            }),
+        );
     };
     return (
         <div className="grid grid-cols-2 gap-4">
             {items.map((item) => (
                 <div
                     key={item.id}
-                    className="relative"
+                    className={twMerge('relative', item.outOfStock ? 'opacity-50' : '')}
                     onClick={() => {
                         handleItemClick(item);
                     }}
@@ -142,8 +163,10 @@ const GridLayoutMenuItems = ({ items, currency }: { items: MenuItem[]; currency:
                     <div className="relative flex-shrink-0">
                         <ImageView className="h-[177px] w-[177px] rounded-lg" src={item.image} alt={item.translations[0]?.name} />
                         {item.outOfStock ? (
-                            <div className="absolute right-0 bottom-0 left-0">
-                                <span className="text-xs">out of stock</span>
+                            <div className="absolute right-0 bottom-0 left-0 p-2">
+                                <Badge className="capitalize" variant={'destructive'}>
+                                    out of stock
+                                </Badge>
                             </div>
                         ) : (
                             <div className="absolute right-0 bottom-0 pr-1 pb-1">

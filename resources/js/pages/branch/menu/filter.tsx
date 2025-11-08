@@ -1,7 +1,7 @@
 import ImageView from '@/components/ImageView';
+import BackToMenus from '@/components/menu_item/BackToMenus';
 import ItemBadges from '@/components/menu_item/ItemBadges';
 import ItemPrices from '@/components/menu_item/ItemPrices';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Branch } from '@/types/branch';
 import { MenuItem } from '@/types/menu_item';
@@ -10,11 +10,7 @@ import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function SearchMenuItems() {
-    const {
-        menuItems = [],
-        branch,
-        table,
-    } = usePage<{
+    const { menuItems = [], branch } = usePage<{
         menuItems: MenuItem[];
         branch: Branch;
         table: Table;
@@ -29,21 +25,11 @@ export default function SearchMenuItems() {
             },
         });
     };
-    const handleBackClick = () => {
-        router.visit(
-            route('branch_menu.index', {
-                tenant_id: branch.tenantId,
-                branch_id: branch.id,
-                table_public_token: table.publicToken,
-            }),
-        );
-    };
+
     return (
         <div className="p-4">
             <div className="flex items-center gap-2">
-                <Button onClick={handleBackClick} variant={'outline'}>
-                    Back
-                </Button>
+                <BackToMenus />
                 <Input
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -91,7 +77,7 @@ const MenuItemItem = ({ item, currency }: { item: MenuItem; currency: string }) 
     return (
         <div className="flex w-full cursor-pointer items-start gap-4 py-4" onClick={handleItemClick}>
             <div className="relative flex-shrink-0">
-                <ImageView className="h-[120px] w-[120px] rounded-lg" src={item.image} alt={item.translations[0]?.name} />
+                <ImageView className="h-[96px] w-[96px] rounded-lg" src={item.image} alt={item.translations[0]?.name} />
             </div>
             <div className="flex-grow border-b pb-4">
                 <div>

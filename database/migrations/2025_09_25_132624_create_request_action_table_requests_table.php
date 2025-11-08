@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('table_id')->constrained('tables')->cascadeOnDelete();
             $table->foreignId('request_action_id')->constrained('request_actions')->cascadeOnDelete();
+            $table->foreignId('branch_id')->constrained('branches')->onDelete('cascade');
             $table->enum('status', ['pending', 'seen', 'done'])->default('pending'); // cashier workflow
             $table->timestamps();
         });

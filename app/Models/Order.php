@@ -30,7 +30,9 @@ class Order extends Model
         'total',
         'order_source',
         'order_number',
-
+        'paid_at',
+        'quantity',
+        'vat_rate',
     ];
 
     public function branch()

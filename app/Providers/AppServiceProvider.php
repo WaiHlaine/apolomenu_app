@@ -20,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force using GD driver
+        // config(['qr-code.image.backend' => 'gd']);
         JsonResource::withoutWrapping();
     }
 }

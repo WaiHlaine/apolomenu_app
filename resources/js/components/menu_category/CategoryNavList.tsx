@@ -1,6 +1,6 @@
 import { MenuCategory } from '@/types/category';
 import { router, usePage } from '@inertiajs/react';
-import { GripVerticalIcon } from 'lucide-react';
+// import { GripVerticalIcon } from 'lucide-react';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { Switch } from '../ui/switch';
@@ -10,6 +10,7 @@ export default function CategoryNavList() {
         categories: MenuCategory[];
     };
     const { id } = route().params as { id: string };
+    if (!props.categories) return null;
     return (
         <div className="flex flex-col gap-3 border-b px-2 py-3">
             {(props.categories ?? []).map((category) => {
@@ -46,10 +47,13 @@ const CategoryNavItem = ({ category, isActive }: { category: MenuCategory; isAct
     return (
         <div
             onClick={navigateToCategory}
-            className={twMerge('flex cursor-pointer items-center gap-2 rounded-md px-4 py-1.5 hover:bg-gray-100', isActive ? 'bg-gray-100' : '')}
+            className={twMerge(
+                'flex cursor-pointer items-center justify-between gap-2 rounded-md px-4 py-1.5 hover:bg-gray-100',
+                isActive ? 'bg-gray-100' : '',
+            )}
         >
-            <GripVerticalIcon className="h-6 w-6 text-gray-400" />
-            <p className="flex-grow">{category.name}</p>
+            {/* <GripVerticalIcon className="h-6 w-6 text-gray-400" /> */}
+            <p className="max-w-[150px] flex-grow truncate capitalize">{category.name}</p>
             <Switch checked={available} onClick={toggleAvailability} />
         </div>
     );

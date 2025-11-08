@@ -22,6 +22,7 @@ class BranchMenuController extends Controller
     public function branchMenus(string $tenant_id, string $branch_id, string $table_public_token, Request $request)
     {
         $branch = Branch::findOrFail($branch_id);
+        $list_view = $request->query('list_view') ?? 'list'; // list or grid
         $table = Table::with('branch')
             ->where([
                 'public_token' => $table_public_token,
@@ -48,12 +49,13 @@ class BranchMenuController extends Controller
         $category = $categoryId ? MenuCategory::findOrFail($categoryId) : MenuCategory::first();
 
         $menuItems = $category ? MenuItem::with(['translations', 'variants', 'badges'])
-            ->where('category_id', $category->id)
+            ->where('category_id', $category?->id)
             ->get() : collect();
 
         return Inertia::render('branch/menu/index', [
             'categories' => MenuCategoryResource::collection($categories),
             'category' => $category ? MenuCategoryResource::make($category) : null,
+            'list_view' => $list_view, // ✅ pass to frontend
             'menuItems' => MenuItemResource::collection($menuItems),
             'table' => TableResource::make($table),
             'branch' => BranchResource::make($branch),
@@ -70,7 +72,7 @@ class BranchMenuController extends Controller
 
         return Inertia::render('branch/menu/show', [
             'menuItem' => MenuItemResource::make($menuItem),
-            'branch' => $menuItem->category->branch,
+            'branch' => BranchResource::make($menuItem->category->branch),
             'table' => TableResource::make($table),
         ]);
     }
@@ -86,13 +88,13 @@ class BranchMenuController extends Controller
                 $query->where(function ($q) use ($search) {
                     // search in translations (name + description)
                     $q->whereHas('translations', function ($t) use ($search) {
-                        $t->where('name', 'like', "%{$search}%")
-                            ->orWhere('description', 'like', "%{$search}%");
+                        $t->where('name', 'ilike', "%{$search}%")
+                            ->orWhere('description', 'ilike', "%{$search}%");
                     })
                     // optional: also search in category name
                         ->orWhereHas('category', function ($c) use ($search) {
-                            $c->where('name', 'like', "%{$search}%")
-                                ->orWhere('description', 'like', "%{$search}%");
+                            $c->where('name', 'ilike', "%{$search}%")
+                                ->orWhere('description', 'iike', "%{$search}%");
                         });
                 });
             })

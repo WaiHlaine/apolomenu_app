@@ -2,7 +2,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useUserDeleteStore } from '@/store/user/userDeleteStore';
 import { useUserPasswordResetStore } from '@/store/user/useUserPasswordResetStore';
 import { User } from '@/types/user';
-import { MoreHorizontalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { MoreVerticalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import { Button } from '../ui/button';
 import UserPasswordResetDialog from './UserPasswordResetDialog';
 export default function UserMoreActionsMenu({ user }: { user: User }) {
@@ -23,17 +23,17 @@ export default function UserMoreActionsMenu({ user }: { user: User }) {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant={'ghost'} size={'sm'}>
-                        <MoreHorizontalIcon size={16} />
+                        <MoreVerticalIcon size={16} />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuItem onClick={handleResetPasswordClick}>
-                        <PencilIcon />
-                        Reset password
+                        <PencilIcon className="text-red-500" />
+                        <p>Reset password</p>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleDeleteClick}>
-                        <Trash2Icon />
-                        Delete
+                        <Trash2Icon className="text-red-500" />
+                        <p>Delete</p>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

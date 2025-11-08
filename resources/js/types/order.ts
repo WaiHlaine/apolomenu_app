@@ -20,6 +20,8 @@ export interface Order {
     discount: number;
     tax: number;
     total: number;
+    quantity: number;
+    vatRate: number;
     orderSource?: string | null;
     orderNumber: number;
 
@@ -28,6 +30,9 @@ export interface Order {
     user?: User; // cashier/staff
     table?: Table;
     items?: OrderItem[];
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
 }
 
 export interface OrderItem {

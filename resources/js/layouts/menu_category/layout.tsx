@@ -14,9 +14,9 @@ export default function CategoryLayout({ children }: PropsWithChildren) {
                 },
             ]}
         >
-            <div className="flex h-full w-full items-start gap-5 p-8">
-                <div className="w-[301px] shrink-0 rounded-md border">
-                    <div className="border-b px-5 py-4">
+            <div className="flex h-full w-full flex-col items-start gap-5 overflow-y-auto p-8 md:flex-row">
+                <div className="w-full shrink-0 rounded-md border md:w-[301px]">
+                    <div className="border-b px-6 py-5">
                         <CategoryTitle />
                     </div>
                     <CategoryNavList />

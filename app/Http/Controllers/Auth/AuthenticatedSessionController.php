@@ -31,33 +31,42 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
         $user = $request->user();
-
         $branches = $user->branches;
 
+        // ✅ Handle branch logic first
         if ($branches->count() === 1) {
-            // Auto set branch if only one
             session([SessionKeys::CURRENT_BRANCH_ID => $branches->first()->id]);
-
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
-
-        if ($branches->count() > 1) {
-            // Redirect to branch selector
+        } elseif ($branches->count() > 1) {
             return redirect()->route('branch.select');
+        } else {
+            // No branches at all
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors([
+                'email' => 'You are not assigned to any branch.',
+            ]);
         }
 
-        // No branches at all (edge case)
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // ✅ Role-based redirection
+        if ($user->hasRole('admin')) {
+            return redirect()->intended(route('menu_category.index', absolute: false));
+        }
 
-        return redirect()->route('login')->withErrors([
-            'email' => 'You are not assigned to any branch.',
-        ]);
+        if ($user->hasRole('cashier')) {
+            return redirect()->intended(route('cashier.menus', absolute: false));
+        }
+
+        if ($user->hasRole('kitchen')) {
+            return redirect()->intended(route('kitchen.orders', absolute: false));
+        }
+
+        // ✅ Default redirect (optional)
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**

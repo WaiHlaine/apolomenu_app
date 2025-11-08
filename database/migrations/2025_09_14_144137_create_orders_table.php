@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
 
+            $table->bigInteger('order_number')->nullable();
+
             // Relations
             $table->foreignId('branch_id')
                 ->constrained('branches')
@@ -41,12 +43,16 @@ return new class extends Migration
                 'preparing',
                 'ready',
                 'completed',
+                'served',
                 'cancelled',
             ])->default('pending');
 
+            $table->timestamp('paid_at')->nullable();
+            $table->integer('quantity')->default(0);
             // Customer environment
             $table->string('customer_ip')->nullable();
             $table->string('customer_user_agent')->nullable();
+            $table->decimal('vat_rate', 5, 2)->default(0);
 
             // Optional location
             $table->float('lat')->nullable();

@@ -4,40 +4,51 @@ import { ColumnDef } from "@tanstack/react-table";
 
 interface GetColumnsOptions<T> {
   withActions?: boolean;
+  withBaseColumns?: boolean
   renderActions?: (row: T) => React.ReactNode;
   renderIcon?: (row: T) => React.ReactNode;
+  renderIconName?: string;
   additionalColumns?: ColumnDef<T>[]; // NEW: support extra columns
 }
 
-export function getColumns<T>(options: GetColumnsOptions<T> = {}): ColumnDef<T>[] {
+export function getColumns<T>({
+  withActions,
+  withBaseColumns = true,
+  renderActions,
+  renderIcon,
+  renderIconName,
+  additionalColumns
+}: GetColumnsOptions<T> = {}): ColumnDef<T>[] {
   const baseColumns: ColumnDef<T>[] = [];
 
   // Optional icon column
-  if (options.renderIcon) {
+  if (renderIcon) {
     baseColumns.push({
-      id: "icon",
-      header: "Icon",
-      cell: ({ row }) => options.renderIcon!(row.original),
+      id: renderIconName || "icon",
+      header: renderIconName || "Icon",
+      cell: ({ row }) => renderIcon!(row.original),
     });
   }
 
   // Always include Name column by default
-  baseColumns.push({
+  if (withBaseColumns) {
+    baseColumns.push({
     accessorKey: "name",
     header: "Name",
   });
+  }
 
   // Add additional columns if provided
-  if (options.additionalColumns && options.additionalColumns.length > 0) {
-    baseColumns.push(...options.additionalColumns);
+  if (additionalColumns && additionalColumns.length > 0) {
+    baseColumns.push(...additionalColumns);
   }
 
   // Optional actions column
-  if (options.withActions && options.renderActions) {
+  if (withActions && renderActions) {
     baseColumns.push({
       id: "actions",
       // header: "Actions", // optional
-      cell: ({ row }) => options.renderActions!(row.original),
+      cell: ({ row }) => renderActions!(row.original),
     });
   }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RequestActionTableRequestCreatedEvent;
 use App\Http\Requests\RequestActionTableRequestRequest;
 use App\Http\Resources\RequestActionTableRequestResource;
 use App\Models\RequestAction;
@@ -20,7 +21,9 @@ class TableRequestActionsController extends Controller
     public function store(RequestActionTableRequestRequest $request)
     {
         $table = Table::with('branch')->where('id', $request->validated('table_id'))->firstOrFail();
-        RequestActionTableRequest::create($request->validated());
+        $tableRequestActionRequest = RequestActionTableRequest::create($request->validated());
+        $tableRequestActionRequest->loadMissing(['table', 'requestAction']);
+        RequestActionTableRequestCreatedEvent::dispatch($tableRequestActionRequest);
 
         return redirect()->route('branch_menu.index', [
             'tenant_id' => $table->branch->tenant_id,
@@ -59,18 +62,21 @@ class TableRequestActionsController extends Controller
             'icon' => 'pay_bill',
         ]);
 
-        RequestActionTableRequest::create([
+        $tableRequestActionRequest = RequestActionTableRequest::create([
             'table_id' => $table->id,
             'request_action_id' => $requestAction->id,
             'branch_id' => $branch_id,
             'status' => 'pending',
         ]);
+        $tableRequestActionRequest->loadMissing(['table', 'requestAction']);
+
+        RequestActionTableRequestCreatedEvent::dispatch($tableRequestActionRequest);
 
         return redirect()->route('branch_menu.index', [
             'tenant_id' => $tenant_id,
             'branch_id' => $branch_id,
             'table_public_token' => $table_public_token,
         ]
-        )->with('success', 'Request has been made successfully.');
+        )->with('success', 'Bill requested');
     }
 }

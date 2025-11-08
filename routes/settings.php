@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Resources\RequestActionTableRequestResource;
+use App\Models\RequestActionTableRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,7 +21,14 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:6,1')
         ->name('password.update');
 
-    Route::get('settings/appearance', function () {
-        return Inertia::render('settings/appearance');
+    Route::get('settings/appearance', function (Request $request) {
+        $showNotifications = $request->query('notifications', false);
+
+        return Inertia::render('settings/appearance', [
+            'notifications' => Inertia::optional(fn () => $showNotifications == 'true' ? RequestActionTableRequestResource::collection(RequestActionTableRequest::with(['table', 'requestAction'])->where('status', 'pending')->get()) : []),
+            'filters' => [
+                'notifications' => $showNotifications,
+            ],
+        ]);
     })->name('appearance');
 });

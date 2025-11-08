@@ -21,6 +21,7 @@ export default function MenuCategoriesNavList() {
                 table_public_token: table.publicToken,
             }),
             { category_id: categoryId },
+            { preserveScroll: true, preserveState: true },
         );
     };
 

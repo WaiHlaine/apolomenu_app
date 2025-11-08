@@ -4,6 +4,7 @@ import { OrderItem as OrderItemType, useOrderItemStore } from '@/store/useOrderI
 import { MenuItem } from '@/types/menu_item';
 import { usePage } from '@inertiajs/react';
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import { Badge } from '../ui/badge';
 
 export default function OrderItem({ orderItem, menuItem, currency }: { orderItem: OrderItemType; menuItem: MenuItem; currency: string }) {
     const { table, branch } = usePage<{ table: { id: number }; branch: { id: number } }>().props;
@@ -28,7 +29,6 @@ export default function OrderItem({ orderItem, menuItem, currency }: { orderItem
         <div className="flex items-start gap-2 border-b py-3">
             <ImageView className="h-[96px] w-[96px] rounded-lg" src={menuItem.image} alt={menuItem.translations[0].name} />
             <div className="flex-grow">
-                {orderItem.notes && <p className="text-sm font-medium">{orderItem.notes}</p>}
                 <span className="text-lg font-bold">{menuItem.translations[0].name}</span>
                 {selectedVariant && selectedVariant.name && <span className="ml-1 font-bold">{`(${selectedVariant.name})`}</span>}
 
@@ -52,8 +52,18 @@ export default function OrderItem({ orderItem, menuItem, currency }: { orderItem
                         <p>
                             {totalPrice} {currency}
                         </p>
+                        <div className="text-end">
+                            <Button size="icon" variant="outline" onClick={() => removeOrderItem(key, orderItem.menuItemId, orderItem.variantId)}>
+                                <Trash2 />
+                            </Button>
+                        </div>
                     </div>
                 </div>
+                {orderItem.notes && (
+                    <div className="mt-2">
+                        <Badge variant={'destructive'}>{orderItem.notes}</Badge>
+                    </div>
+                )}
             </div>
         </div>
     );

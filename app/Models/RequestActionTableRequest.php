@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Model;
 
 class RequestActionTableRequest extends Model
@@ -21,5 +22,11 @@ class RequestActionTableRequest extends Model
     public function requestAction()
     {
         return $this->belongsTo(RequestAction::class);
+    }
+
+    // global scope
+    public static function booted()
+    {
+        static::addGlobalScope(new BranchScope);
     }
 }

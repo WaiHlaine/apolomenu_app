@@ -1,4 +1,5 @@
 import { Branch } from './branch';
+import { Table } from './table';
 
 export type RequestAction = {
     id: number;
@@ -7,3 +8,10 @@ export type RequestAction = {
     branchId: number;
     branch: Branch;
 };
+
+export interface RequestActionTableRequest {
+    id: number;
+    status: string;
+    table: Table;
+    requestAction: RequestAction;
+}

@@ -8,4 +8,6 @@ enum OrderItemStatus: string
     case InProgress = 'in_progress';
     case Completed = 'completed';
     case Cancelled = 'cancelled';
+    case Ready = 'ready';
+    case Served = 'served';
 }

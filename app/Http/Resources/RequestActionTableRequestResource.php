@@ -18,7 +18,7 @@ class RequestActionTableRequestResource extends JsonResource
             'id' => $this->id,
             'status' => $this->status,
             'table' => new TableResource($this->whenLoaded('table')),
-            'request_action' => new RequestActionResource($this->whenLoaded('requestAction')),
+            'requestAction' => new RequestActionResource($this->whenLoaded('requestAction')),
             'created_at' => $this->created_at,
         ];
     }

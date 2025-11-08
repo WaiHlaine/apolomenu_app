@@ -3,15 +3,33 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, DollarSign, LayoutGrid, MapPin, QrCodeIcon, Settings, Users2, UtensilsCrossed } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    BookOpen,
+    ConciergeBellIcon,
+    DollarSign,
+    LayoutGrid,
+    ListIcon,
+    MapPin,
+    QrCodeIcon,
+    Settings,
+    Users2,
+    UtensilsCrossed,
+    WarehouseIcon,
+} from 'lucide-react';
 import AppLogo from './app-logo';
+import HasRole from './HasRole';
 
-const mainNavItems: NavItem[] = [
+const adminNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Orders',
+        href: route('admin.orders'),
+        icon: ListIcon,
     },
     {
         title: 'Users List',
@@ -33,27 +51,68 @@ const mainNavItems: NavItem[] = [
         href: route('menu_category.index'),
         icon: UtensilsCrossed,
     },
-    //restaurant/settings/general
-    //restaurant/settings/finance
-    //restaurant/settings/location
+    // Collapsible Settings Group
     {
-        title: 'General settings',
-        href: route('restaurant_setting.general'),
+        title: 'Settings',
         icon: Settings,
+        href: route('restaurant_setting.general'),
+        items: [
+            {
+                title: 'General settings',
+                href: route('restaurant_setting.general'),
+                icon: Settings,
+            },
+            {
+                title: 'VAT, Currency, Language',
+                href: route('restaurant_setting.vat_currency_language'),
+                icon: DollarSign,
+            },
+            {
+                title: 'Location',
+                href: route('restaurant_setting.location'),
+                icon: MapPin,
+            },
+        ],
+    },
+];
+
+const cashierNavItems: NavItem[] = [
+    {
+        title: 'Orders',
+        href: route('cashier.orders'),
+        icon: ListIcon,
     },
     {
-        title: 'VAT, Currency, Language',
-        href: route('restaurant_setting.finance'),
-        icon: DollarSign,
+        title: 'Menus',
+        href: route('cashier.menus'),
+        icon: UtensilsCrossed,
+    },
+
+    {
+        title: 'Stock',
+        href: route('cashier.stocks'),
+        icon: WarehouseIcon,
     },
     {
-        title: 'Location',
-        href: route('restaurant_setting.location'),
-        icon: MapPin,
+        title: 'Kitchen',
+        href: route('kitchen.orders'),
+        icon: ConciergeBellIcon,
+    },
+];
+
+const kitchenNavItems: NavItem[] = [
+    {
+        title: 'Orders',
+        href: route('kitchen.orders'),
+        icon: ConciergeBellIcon,
     },
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props;
+    console.log({
+        auth,
+    });
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -69,7 +128,16 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <HasRole role="admin">
+                    <NavMain items={adminNavItems} />
+                </HasRole>
+                <HasRole role="cashier">
+                    <NavMain items={cashierNavItems} />
+                    {/* <NotificationsList /> */}
+                </HasRole>
+                <HasRole role="kitchen">
+                    <NavMain items={kitchenNavItems} />
+                </HasRole>
             </SidebarContent>
 
             <SidebarFooter>

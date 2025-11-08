@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import ImageUpload from '../ImageUpload';
+import { Textarea } from '../ui/textarea';
 
 type Variant = { name: string; price: string };
 
@@ -164,7 +165,7 @@ export default function AddNewMenuItemDialog() {
                         <Label htmlFor="description">
                             Description <span className="text-muted-foreground">(Optional)</span>
                         </Label>
-                        <Input id="description" {...form.register('description')} />
+                        <Textarea id="description" {...form.register('description')} />
                         {form.formState.errors.description && <p className="text-xs text-red-500">{form.formState.errors.description.message}</p>}
                     </div>
 
@@ -235,7 +236,7 @@ export default function AddNewMenuItemDialog() {
                     {/* image */}
                     <div>
                         <Label htmlFor="image">Photo</Label>
-                        <ImageUpload onSelect={(value) => form.setValue('image', value)} />
+                        <ImageUpload id="menu-item-image" value={form.watch('image')} onSelect={(value) => form.setValue('image', value)} />
 
                         {form.formState.errors.image && <p className="text-xs text-red-500">{form.formState.errors.image.message as string}</p>}
                     </div>

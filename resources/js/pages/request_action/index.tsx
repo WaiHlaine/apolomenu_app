@@ -3,6 +3,7 @@
 import DeleteDialog from '@/components/DeleteDialog';
 import AddNewRequestActionDialog from '@/components/request_action/AddNewRequestActionDialog';
 import EditRequestActionDialog from '@/components/request_action/EditRequestActionDialog';
+import { REQUEST_ACTION_ICON_NAMES } from '@/components/request_action/RequestActionForm';
 import SearchRequestAction from '@/components/request_action/SearchRequestAction';
 import { getColumns } from '@/components/ui/columns';
 import { DataTable } from '@/components/ui/data-table';
@@ -13,7 +14,7 @@ import { RequestAction } from '@/types/request-action';
 
 const columns = getColumns<RequestAction>({
     withActions: true,
-    renderIcon: (action) => <img src={`/storage/request_action/${action.icon}.svg`} alt={action.name} className="h-10 w-10" />,
+    renderIcon: (action) => REQUEST_ACTION_ICON_NAMES.find((icon) => icon.name === action.icon)?.component,
     renderActions: (action) => (
         <div className="flex justify-end space-x-2">
             <EditRequestActionDialog action={action} />

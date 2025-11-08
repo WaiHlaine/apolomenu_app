@@ -88,8 +88,8 @@ export default function RestaurantGeneralSettings({ branch }: { branch: Branch }
                 },
             ]}
         >
-            <div className="flex h-full justify-center border p-4">
-                <div className="h-full w-full max-w-3xl rounded-md border p-6">
+            <div className="flex h-full justify-center p-4">
+                <div className="h-full w-full max-w-3xl rounded-md p-6">
                     <div>
                         <p className="text-2xl font-semibold">General Settings</p>
                         <p className="mt-1.5 text-sm">Manage the restaurant general settings.</p>
@@ -146,7 +146,7 @@ export default function RestaurantGeneralSettings({ branch }: { branch: Branch }
                                             form.watch('logo') instanceof File
                                                 ? URL.createObjectURL(form.watch('logo') as File)
                                                 : branch.logoImage
-                                                  ? `/storage/${branch.logoImage}`
+                                                  ? `${branch.logoImage}`
                                                   : undefined
                                         }
                                         alt="Preview"
@@ -161,7 +161,7 @@ export default function RestaurantGeneralSettings({ branch }: { branch: Branch }
                                             form.watch('logo') instanceof File
                                                 ? URL.createObjectURL(form.watch('logo') as File)
                                                 : branch.logoImage
-                                                  ? `/storage/${branch.logoImage}`
+                                                  ? `${branch.logoImage}`
                                                   : undefined
                                         }
                                         alt={branch.logoImage}
@@ -212,7 +212,7 @@ export default function RestaurantGeneralSettings({ branch }: { branch: Branch }
                                             form.watch('banner') instanceof File
                                                 ? URL.createObjectURL(form.watch('logo') as File)
                                                 : branch.coverImage
-                                                  ? `/storage/${branch.coverImage}`
+                                                  ? `${branch.coverImage}`
                                                   : undefined
                                         }
                                         alt={branch.coverImage}
@@ -246,7 +246,7 @@ export default function RestaurantGeneralSettings({ branch }: { branch: Branch }
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit">Save Settings</Button>
+                            <Button type="submit">Save changes</Button>
                         </div>
                     </form>
                 </div>

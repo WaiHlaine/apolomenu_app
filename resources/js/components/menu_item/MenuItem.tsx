@@ -1,5 +1,5 @@
 import { MenuItem as TMenuItem } from '@/types/menu_item';
-import { GripVerticalIcon, ImageOffIcon } from 'lucide-react';
+import { ImageOffIcon } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import DeleteMenuItemDialog from './DeleteMenuItemDialog';
 import EditMenuitemButton from './EditMenuItemButton';
@@ -13,9 +13,7 @@ export default function MenuItem({ menuItem, currency }: { menuItem: TMenuItem; 
     return (
         <div className="flex items-center gap-2">
             {/* drag icon */}
-            <div className="flex place-content-center">
-                <GripVerticalIcon className="text-gray-400" />
-            </div>
+            <div className="flex place-content-center">{/* <GripVerticalIcon className="text-gray-400" /> */}</div>
             <div className="flex flex-grow items-start gap-4 border-b py-4">
                 {/* image */}
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-gray-50">
@@ -29,7 +27,7 @@ export default function MenuItem({ menuItem, currency }: { menuItem: TMenuItem; 
                 </div>
                 <div className="flex flex-grow items-center">
                     <div className="ml-5 flex-grow">
-                        <p className="font-bold">{menuItem.translations[0].name}</p>
+                        <p className="font-bold capitalize">{menuItem.translations[0].name}</p>
                         <p className="mt-2 text-gray-400">{menuItem.translations[0].description}</p>
                         <div className="mt-2 flex items-center gap-2">
                             {menuItem.badges.map((badge) => (

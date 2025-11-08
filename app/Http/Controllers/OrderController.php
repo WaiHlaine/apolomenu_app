@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
+use App\Enums\SessionKeys;
 use App\Events\OrderCreatedEvent;
+use App\Http\Requests\StoreOrderByCashierRequest;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderStatusRequest;
 use App\Http\Resources\BranchResource;
@@ -28,23 +30,43 @@ class OrderController extends Controller
     {
         $validated = $request->validated();
 
-        $table = Table::with('branch')->where('public_token', $request->validated('tablePublicToken'))->firstOrFail();
+        $table = Table::with('branch')
+            ->where('public_token', $validated['tablePublicToken'])
+            ->firstOrFail();
+        $branch = $table->branch;
 
-        // 1. Check all items availability first
+        // 0 radius means location off
+        if ($branch->lat && $branch->long && $branch->radius && $branch->radius > 0) {
+            $userLat = $validated['lat'] ?? null;
+            $userLong = $validated['long'] ?? null;
+
+            if (! $userLat || ! $userLong) {
+                throw ValidationException::withMessages([
+                    'location' => 'We could not detect your location. Please enable location access to order.',
+                ]);
+            }
+
+            $distance = $this->calculateDistance(
+                $branch->lat,
+                $branch->long,
+                $userLat,
+                $userLong
+            );
+
+            if ($distance > $branch->radius) {
+                throw ValidationException::withMessages([
+                    'location' => 'You are too far from the restaurant to place an order.',
+                ]);
+            }
+        }
+
         foreach ($validated['items'] as $itemData) {
             $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
-
-            // check menu items availability
             if ($menuItem->out_of_stock) {
                 throw ValidationException::withMessages([
                     'items' => ["{$menuItem->translations()->first()->name} is out of stock."],
                 ]);
             }
-
-            // $variantPrice = $menuItem->variants()
-            //     ->where('id', $itemData['menu_item_variant_id'] ?? null)
-            //     ->value('price') ?? $menuItem->price ?? 0;
-
             if ($itemData['quantity'] <= 0) {
                 throw ValidationException::withMessages([
                     'items' => ["Quantity for {$menuItem->translations()->first()->name} must be at least 1."],
@@ -54,8 +76,8 @@ class OrderController extends Controller
 
         return DB::transaction(function () use ($validated, $table) {
             $subtotal = 0;
+            $totalQuantity = 0;
 
-            // Calculate subtotal
             foreach ($validated['items'] as $itemData) {
                 $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
                 $price = $menuItem->variants()
@@ -63,31 +85,36 @@ class OrderController extends Controller
                     ->value('price') ?? $menuItem->price ?? 0;
 
                 $subtotal += $price * $itemData['quantity'];
+                $totalQuantity += $itemData['quantity'];
             }
 
             $discount = $validated['discount'] ?? 0;
-            $vatRate = Branch::findOrFail($validated['branchId'])->vat ?? 0;
-            $tax = ($subtotal - $discount) * ($vatRate / 100);
-            $total = $subtotal - $discount + $tax;
 
-            // 2. Create order
+            // store the VAT rate used right now
+            $vatRate = Branch::findOrFail($validated['branchId'])->vat ?? 0;
+
+            // compute tax and totals (round to 2 decimals)
+            $tax = round(($subtotal - $discount) * ($vatRate / 100), 2);
+            $total = round($subtotal - $discount + $tax, 2);
+
             $order = Order::create([
                 'branch_id' => $validated['branchId'],
                 'table_id' => $table->id ?? null,
-                'user_id' => request()->user() ? request()->user()->id : null, // customer order, no user account
+                'user_id' => request()->user()?->id,
                 'customer_ip' => request()->ip(),
                 'customer_user_agent' => request()->header('User-Agent'),
                 'lat' => $validated['lat'] ?? null,
                 'long' => $validated['long'] ?? null,
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'pending',
-                'subtotal' => $subtotal,
-                'discount' => $discount,
-                'tax' => $tax,
+                'subtotal' => round($subtotal, 2),
+                'discount' => round($discount, 2),
+                'tax' => $tax,              // store the tax amount
+                'vat_rate' => $vatRate,     // store the rate used
                 'total' => $total,
+                'quantity' => $totalQuantity,
             ]);
 
-            // 3. Create order items
             foreach ($validated['items'] as $itemData) {
                 $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
                 $price = $menuItem->variants()
@@ -106,7 +133,6 @@ class OrderController extends Controller
                 ]);
             }
 
-            // ✅ Emit event after commit
             OrderCreatedEvent::dispatch($order);
 
             return redirect()->route('order.active', [
@@ -114,6 +140,104 @@ class OrderController extends Controller
                 'branch_id' => $validated['branchId'],
                 'table_public_token' => $table->public_token,
             ])->with('success', 'Order created successfully.');
+        });
+    }
+
+    private function calculateDistance($lat1, $lng1, $lat2, $lng2)
+    {
+        $earthRadius = 6371000; // meters
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLng / 2) * sin($dLng / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c; // in meters
+    }
+
+    /**
+     * Store a new customer order by cashier
+     */
+    public function storeByCashier(StoreOrderByCashierRequest $request)
+    {
+
+        $validated = $request->validated();
+
+        foreach ($validated['items'] as $itemData) {
+            $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
+            if ($menuItem->out_of_stock) {
+                throw ValidationException::withMessages([
+                    'items' => ["{$menuItem->translations()->first()->name} is out of stock."],
+                ]);
+            }
+            if ($itemData['quantity'] <= 0) {
+                throw ValidationException::withMessages([
+                    'items' => ["Quantity for {$menuItem->translations()->first()->name} must be at least 1."],
+                ]);
+            }
+        }
+
+        return DB::transaction(function () use ($validated) {
+            $subtotal = 0;
+            $totalQuantity = 0;
+
+            foreach ($validated['items'] as $itemData) {
+                $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
+                $price = $menuItem->variants()
+                    ->where('id', $itemData['variantId'] ?? null)
+                    ->value('price') ?? $menuItem->price ?? 0;
+
+                $subtotal += $price * $itemData['quantity'];
+                $totalQuantity += $itemData['quantity'];
+            }
+
+            $discount = $validated['discount'] ?? 0;
+
+            // store the VAT rate used right now
+            $vatRate = Branch::findOrFail(session(SessionKeys::CURRENT_BRANCH_ID))->vat ?? 0;
+
+            // compute tax and totals (round to 2 decimals)
+            $tax = round(($subtotal - $discount) * ($vatRate / 100), 2);
+            $total = round($subtotal - $discount + $tax, 2);
+
+            $order = Order::create([
+                'branch_id' => session(SessionKeys::CURRENT_BRANCH_ID),
+                'table_id' => $validated['tableId'] ?? null,
+                'user_id' => request()->user()?->id,
+                'customer_ip' => request()->ip(),
+                'customer_user_agent' => request()->header('User-Agent'),
+                'notes' => $validated['notes'] ?? null,
+                'subtotal' => round($subtotal, 2),
+                'discount' => round($discount, 2),
+                'tax' => $tax,              // store the tax amount
+                'vat_rate' => $vatRate,     // store the rate used
+                'total' => $total,
+                'quantity' => $totalQuantity,
+                'order_type' => $validated['orderType'],
+            ]);
+
+            foreach ($validated['items'] as $itemData) {
+                $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
+                $price = $menuItem->variants()
+                    ->where('id', $itemData['variantId'] ?? null)
+                    ->value('price') ?? $menuItem->price ?? 0;
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'menu_item_id' => $menuItem->id,
+                    'variant_id' => $itemData['variantId'] ?? null,
+                    'quantity' => $itemData['quantity'],
+                    'unit_price' => $price,
+                    'total_price' => $price * $itemData['quantity'],
+                    'notes' => $itemData['notes'] ?? null,
+                    'status' => 'pending',
+                ]);
+            }
+
+            OrderCreatedEvent::dispatch($order);
+
+            return redirect()->back()->with('success', 'Order created successfully.');
         });
     }
 
@@ -226,7 +350,7 @@ class OrderController extends Controller
         // Load active orders for this table
         $activeOrders = Order::with('items.menuItem.translations', 'items.menuItem.variants', 'items.menuItem.badges') // eager load relations
             ->where('table_id', $table->id)
-            ->whereIn('status', ['pending', 'preparing', 'in_progress']) // active statuses
+            ->whereNotIn('status', [OrderStatus::Completed]) // active statuses
             ->get();
 
         // Calculate aggregated totals

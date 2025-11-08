@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->text('image');
+            $table->text('image')->nullable();
             $table->integer('position')->default(0);
+            $table->boolean('available')->default(true);
             $table->foreignId('branch_id')->constrained('branches')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
