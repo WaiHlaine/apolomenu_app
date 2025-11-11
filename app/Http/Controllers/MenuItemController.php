@@ -131,10 +131,10 @@ class MenuItemController extends Controller
             }
 
             // Translation — overwrite Burmese
-            $burmese = Language::where('code', 'my')->first();
-            if ($burmese) {
+            $english = Language::where('code', 'en')->first();
+            if ($english) {
                 $menuItem->translations()->updateOrCreate(
-                    ['language_id' => $burmese->id],
+                    ['language_id' => $english->id],
                     [
                         'name' => $validated['name'],
                         'description' => $validated['description'] ?? null,
