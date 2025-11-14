@@ -1,4 +1,5 @@
 import { ShowFlashMessageToast } from '@/components/ShowFlashToastMessage';
+import { useAudioPlayer } from '@/hooks/use-audio-player';
 import { Branch } from '@/types/branch';
 import { router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
@@ -12,8 +13,10 @@ type KitchenOrdersProps = {
 };
 
 export default function KitchenOrders({ branch }: KitchenOrdersProps) {
+    const { play } = useAudioPlayer('/storage/sounds/new_order.mp3');
     // Echo live updates
     useEcho(`branch.${branch.id}.orders`, 'OrderCreatedEvent', () => {
+        play();
         router.reload();
     });
 
