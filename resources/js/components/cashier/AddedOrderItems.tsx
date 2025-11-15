@@ -1,7 +1,9 @@
+import { useAppearance } from '@/hooks/use-appearance';
 import { OrderItem, useCashierOrderItemStore } from '@/store/cashier/useCashierOrderItemsStore';
 import { Branch } from '@/types/branch';
 import { router, usePage } from '@inertiajs/react';
 import { ImageOffIcon, Minus, Plus, Trash2Icon } from 'lucide-react';
+import { twMerge } from 'tailwind-merge';
 import Price from '../common/Price';
 import { Button } from '../ui/button';
 
@@ -9,24 +11,16 @@ export default function AddedOrderItems({ tableId, orderType }: { tableId?: stri
     const {
         branch,
         filters: { table },
-        flash,
     } = usePage<{
         branch: Branch;
         filters: {
             table: string;
         };
     }>().props;
-    console.log({
-        table,
-        flash,
-    });
+    const { appearance } = useAppearance();
     const allOrders = useCashierOrderItemStore((store) => store.orders);
     const uniqueKey = `${branch.id}-${tableId || table}`;
-    console.log({
-        uniqueKey,
-    });
     const orders = allOrders[uniqueKey];
-    console.log({ orders });
     const clearOrder = useCashierOrderItemStore((store) => store.clearOrder);
     const addOrUpdateOrderItem = useCashierOrderItemStore((store) => store.addOrUpdateOrderItem);
     const decreaseOrderItem = useCashierOrderItemStore((store) => store.decreaseOrderItem);
@@ -59,8 +53,8 @@ export default function AddedOrderItems({ tableId, orderType }: { tableId?: stri
     };
 
     const subtotal = getTotalAmount(uniqueKey);
-    const vatAmount = subtotal * (branch.tax / 100);
-    const total = subtotal + vatAmount;
+    const taxAmount = subtotal * (branch.tax / 100);
+    const total = subtotal + taxAmount;
 
     const handleSaveOrderItems = () => {
         const items = orders?.map((orderItem) => {
@@ -150,14 +144,14 @@ export default function AddedOrderItems({ tableId, orderType }: { tableId?: stri
                     </div>
                 ))}
             </div>
-            <div className="mt-6 rounded-md border bg-white p-3 text-sm">
+            <div className={twMerge('mt-6 rounded-md border bg-white p-3 text-sm', appearance == 'dark' ? 'bg-black' : 'bg-white')}>
                 <div className="flex items-center justify-between">
                     <span>Subtotal</span>
                     <Price amount={subtotal} className="font-bold" />
                 </div>
                 <div className="mt-4 flex items-center justify-between border-b border-dashed pb-5">
-                    <span>TAX {branch.tax}%</span>
-                    <Price amount={vatAmount} className="font-bold" />
+                    <span>Tax ({branch.tax}%)</span>
+                    <Price amount={taxAmount} className="font-bold" />
                 </div>
                 <div className="mt-5 flex items-center justify-between">
                     <span className="font-bold">Total</span>

@@ -21,8 +21,8 @@ export default function ImageUpload({ onSelect, value, id }: { onSelect: (value?
                         <p className="text-sm font-semibold">Drop your image here</p>
                         <p className="text-sm">PNG or JPG ( 1200px * 1200px )</p>
                         <div className="flex items-center gap-2 rounded-sm bg-gray-100 p-2" onClick={handleImageSlectButtonClick}>
-                            <Circle size={16} />
-                            <span className="text-sm">Select photo</span>
+                            <Circle className="text-black" size={16} />
+                            <span className="text-sm text-black">Select photo</span>
                         </div>
                     </div>
                 </div>

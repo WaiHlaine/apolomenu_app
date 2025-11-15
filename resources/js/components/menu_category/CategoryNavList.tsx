@@ -1,6 +1,7 @@
 import { MenuCategory } from '@/types/category';
 import { router, usePage } from '@inertiajs/react';
 // import { GripVerticalIcon } from 'lucide-react';
+import { useAppearance } from '@/hooks/use-appearance';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { Switch } from '../ui/switch';
@@ -23,7 +24,10 @@ export default function CategoryNavList() {
 const CategoryNavItem = ({ category, isActive }: { category: MenuCategory; isActive: boolean }) => {
     // Keep local state for optimistic update
     const [available, setAvailable] = useState(category.available);
-
+    const appearance = useAppearance();
+    console.log({
+        appearance: appearance.appearance,
+    });
     const toggleAvailability = () => {
         // Optimistically update UI
         setAvailable((prev) => !prev);
@@ -48,8 +52,8 @@ const CategoryNavItem = ({ category, isActive }: { category: MenuCategory; isAct
         <div
             onClick={navigateToCategory}
             className={twMerge(
-                'flex cursor-pointer items-center justify-between gap-2 rounded-md px-4 py-1.5 hover:bg-gray-100',
-                isActive ? 'bg-gray-100' : '',
+                'flex cursor-pointer items-center justify-between gap-2 rounded-md border border-white px-4 py-1.5 hover:border-primary',
+                isActive ? 'border-primary' : 'border-gray-300',
             )}
         >
             {/* <GripVerticalIcon className="h-6 w-6 text-gray-400" /> */}

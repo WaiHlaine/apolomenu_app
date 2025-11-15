@@ -1,3 +1,4 @@
+import { useAppearance } from '@/hooks/use-appearance';
 import { orderTypes } from '@/lib/utils';
 import { Branch } from '@/types/branch';
 import { Order } from '@/types/order';
@@ -12,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import AddNewOrderDialog from './AddNewOrderDialog';
 import PaymentDialog from './PaymentDialog';
 export default function TableDetailDialog() {
+    const { appearance } = useAppearance();
     const { filters, tableOrders, table, branch } = usePage<{
         filters: {
             table: string;
@@ -34,6 +36,7 @@ export default function TableDetailDialog() {
     const totalItems = tableOrders.reduce((acc, order) => acc + (order.items?.length || 0), 0);
     const tableOrderTotal = tableOrders.reduce((acc, order) => acc + (Number(order.total) || 0), 0);
     const tableOrderSubTotal = tableOrders.reduce((acc, order) => acc + (Number(order.subtotal) || 0), 0);
+    const tableOrderTaxTotal = tableOrders.reduce((acc, order) => acc + (Number(order.tax) || 0), 0);
     const allServed = tableOrders.reduce(
         (acc, order) => acc && (order.status ?? '').toLowerCase().trim() === 'served',
         true, // initial value is important
@@ -142,7 +145,12 @@ export default function TableDetailDialog() {
                             </div>
                         )}
                     </div>
-                    <div className="sticky bottom-0 z-10 w-full rounded-md border bg-white shadow">
+                    <div
+                        className={twMerge(
+                            'sticky bottom-0 z-10 w-full rounded-md border bg-white shadow',
+                            appearance == 'dark' ? 'bg-black' : 'bg-white',
+                        )}
+                    >
                         {firstOrder && (
                             <div className="flex items-center justify-between px-6 py-2">
                                 <p className="font-bold">Sub Total</p>
@@ -154,9 +162,10 @@ export default function TableDetailDialog() {
 
                         {firstOrder && (
                             <div className="flex items-center justify-between px-6 py-2">
-                                <p className="font-bold">Tax </p>
+                                <p className="font-bold">Tax ({branch.tax}%)</p>
                                 <p className="font-bold">
-                                    <span>{branch.tax}%</span>
+                                    <span></span>
+                                    <Price amount={tableOrderTaxTotal} className="font-bold" />
                                 </p>
                             </div>
                         )}

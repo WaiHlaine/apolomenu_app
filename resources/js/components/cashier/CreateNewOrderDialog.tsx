@@ -1,3 +1,4 @@
+import { useAppearance } from '@/hooks/use-appearance';
 import { useCashierOrderItemStore } from '@/store/cashier/useCashierOrderItemsStore';
 import { Branch } from '@/types/branch';
 import { MenuCategory } from '@/types/category';
@@ -8,6 +9,7 @@ import { router, usePage } from '@inertiajs/react';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { ImageOffIcon, Minus, Plus, PlusIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import Price from '../common/Price';
 import ItemBadges from '../menu_item/ItemBadges';
 import ItemPrices from '../menu_item/ItemPrices';
@@ -153,6 +155,7 @@ export default function CreateNewOrderDialog() {
 }
 
 const OrderableMenuItem = ({ item }: { item: MenuItem }) => {
+    const { appearance } = useAppearance();
     const [notes, setNotes] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [variant, setVariant] = useState(item.variants[0].id.toString());
@@ -193,7 +196,7 @@ const OrderableMenuItem = ({ item }: { item: MenuItem }) => {
 
     return (
         <div key={item.id}>
-            <div className="relative rounded-md border">
+            <div className="relative h-32 w-32 rounded-md border">
                 {item.image ? (
                     <img
                         onClick={() => {
@@ -281,7 +284,12 @@ const OrderableMenuItem = ({ item }: { item: MenuItem }) => {
                                 />
                             </div>
                         </div>
-                        <div className="absolute right-0 bottom-0 left-0 w-full rounded-md border bg-white p-4 shadow">
+                        <div
+                            className={twMerge(
+                                'absolute right-0 bottom-0 left-0 w-full rounded-md border bg-white p-4 shadow',
+                                appearance == 'dark' ? 'bg-black' : 'bg-white',
+                            )}
+                        >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Button disabled={item.outOfStock} onClick={decreaseQuantity}>

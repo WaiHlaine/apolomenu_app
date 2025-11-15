@@ -17,6 +17,7 @@ export default function TableOrders() {
         branch: Branch;
         table: Table;
     }>().props;
+    const tableOrderTaxTotal = orders.reduce((acc, order) => acc + (Number(order.tax) || 0), 0);
 
     return (
         <PublicLayout>
@@ -39,8 +40,8 @@ export default function TableOrders() {
                                     <Price amount={totals['subtotal']} className="text-sm" />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">Tax</span>
-                                    <span className="text-sm">{`${branch.tax}%`}</span>
+                                    <span className="text-sm">Tax ({`${branch.tax}%`})</span>
+                                    <Price amount={tableOrderTaxTotal} className="text-sm" />
                                 </div>
                             </div>
                             <div className="flex items-center justify-between py-3">

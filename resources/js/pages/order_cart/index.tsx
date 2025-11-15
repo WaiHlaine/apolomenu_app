@@ -56,12 +56,15 @@ export default function OrderItemsCart() {
         }
     };
 
-    const totalPrice = orderItems.reduce((acc, item) => {
+    const subTotal = orderItems.reduce((acc, item) => {
         const menuItem = items.find((i) => i.id === item.menuItemId);
         const variant = menuItem?.variants.find((v) => v.id === item.variantId);
         const price = Number(variant?.price ?? item.price ?? 0);
         return acc + price * item.quantity;
     }, 0);
+
+    // const taxPrice = subTotal * (branch.tax / 100);
+    // const totalPrice = subTotal + taxPrice;
 
     const disabled = orderItems.length === 0 || loading || (branch.radius > 0 ? !!error || !lat || !long : false);
 
@@ -89,6 +92,12 @@ export default function OrderItemsCart() {
                     </div>
                 ) : (
                     <div className="absolute right-0 bottom-0 left-0 mt-3 rounded-t-md border bg-white p-4 shadow-md">
+                        {/* {branch.tax > 0 && (
+                            <div className="mb-1 flex items-center justify-between">
+                                <span>Tax ({`${branch.tax}%`})</span>
+                                <Price amount={total} className="text-sm"></Price>
+                            </div>
+                        )} */}
                         <Button className="flex w-full justify-between" onClick={handleOrderClick} disabled={disabled}>
                             <div className="flex items-center gap-1">
                                 <ShoppingCart />
@@ -96,7 +105,7 @@ export default function OrderItemsCart() {
                                     {loading ? 'Checking location...' : error && branch.radius > 0 ? 'Location required' : 'Place order'}
                                 </span>
                             </div>
-                            <Price className="text-sm font-medium" amount={totalPrice} />
+                            <Price className="text-sm font-medium" amount={subTotal} />
                         </Button>
 
                         {/* ✅ Show error if location blocked or failed */}

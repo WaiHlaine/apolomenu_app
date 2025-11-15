@@ -33,7 +33,7 @@ export default function OrderDetail() {
                                 </span> */}
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-sm">Tax</span>
+                                <span className="text-sm">Tax ({`${branch.tax}%`})</span>
                                 <span className="text-sm">{`${branch.tax}%`}</span>
                             </div>
                         </div>
