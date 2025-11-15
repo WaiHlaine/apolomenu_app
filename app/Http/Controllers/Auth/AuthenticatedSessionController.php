@@ -34,9 +34,15 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
+
+        // ✅ Super Admin bypasses branch logic
+        if ($user->hasRole('super_admin')) {
+            return redirect()->intended(route('pulse', absolute: false));
+        }
+
         $branches = $user->branches;
 
-        // ✅ Handle branch logic first
+        // ✅ Handle branch logic for other users
         if ($branches->count() === 1) {
             session([SessionKeys::CURRENT_BRANCH_ID => $branches->first()->id]);
         } elseif ($branches->count() > 1) {

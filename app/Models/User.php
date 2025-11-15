@@ -83,4 +83,9 @@ class User extends Authenticatable
         //     $user->branches()->sync([session(SessionKeys::CURRENT_BRANCH_ID)]);
         // });
     }
+
+    public function isSuperAdmin()
+    {
+        return $this->hasRole('super_admin');
+    }
 }

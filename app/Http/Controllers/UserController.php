@@ -20,7 +20,10 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->with(['roles']);
+        $query = User::query()->with(['roles'])
+            ->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
+            });
 
         $rolesFilter = $request->query('roles');
         $searchFilter = $request->query('search');
@@ -31,7 +34,6 @@ class UserController extends Controller
             $query->whereHas('roles', function ($rolesQuery) use ($rolesFilter) {
                 $rolesQuery->whereIn('id', $rolesFilter);
             });
-
         }
 
         if ($searchFilter) {
@@ -54,7 +56,7 @@ class UserController extends Controller
         return Inertia::render('user/index', [
             'users' => UserResource::collection($users),
             'filters' => $request->only(['search', 'roles', 'sortField', 'sortDirection']),
-            'roles' => RoleResource::collection(Role::all()),
+            'roles' => RoleResource::collection(Role::where('name', '!=', 'super_admin')->get()),
         ]);
     }
 
