@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { router, usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import {ImageOffIcon} from 'lucide-react'
+import { ImageOffIcon } from 'lucide-react';
 dayjs.extend(relativeTime);
 
 interface TableOrder {
@@ -65,7 +65,7 @@ const KitchenTableOrder = ({ table }: { table: TableOrder }) => {
     };
 
     return (
-        <div className="w-[309px] overflow-auto rounded-md border shadow">
+        <div className="w-[309px] rounded-md border shadow">
             <div className="flex justify-between rounded-t-md border-b bg-lime-300 px-3 py-4">
                 <div>
                     <p className="font-bold">{table.table_name}</p>

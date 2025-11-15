@@ -21,7 +21,7 @@ export default function KitchenOrders({ branch }: KitchenOrdersProps) {
     });
 
     return (
-        <div className="flex h-[100vh] w-[100vw] flex-col">
+        <div className="flex w-[100vw] flex-col">
             <KitchenTopBar />
             <KitchenOrdersView />
             <ShowFlashMessageToast />

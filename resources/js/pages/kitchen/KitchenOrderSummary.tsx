@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import { ImageOffIcon } from "lucide-react";
+import { ImageOffIcon } from 'lucide-react';
 interface SummaryItem {
     menu_item_name: string;
     variant_name: string;
@@ -20,7 +20,7 @@ export default function KitchenOrderSummary() {
         return null;
     }
     return (
-        <div className="w-[309px] flex-shrink-0 overflow-auto rounded-md border shadow">
+        <div className="w-[309px] flex-shrink-0 rounded-md border shadow">
             <div className="border-b">
                 <p className="px-2 py-3 text-center font-bold">Order Summary</p>
             </div>
