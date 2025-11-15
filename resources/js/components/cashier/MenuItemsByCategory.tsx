@@ -2,13 +2,13 @@ import { Branch } from '@/types/branch';
 import { MenuCategory } from '@/types/category';
 import { MenuItem } from '@/types/menu_item';
 import { router, usePage } from '@inertiajs/react';
+import { ImageOffIcon } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import ItemBadges from '../menu_item/ItemBadges';
 import ItemPrices from '../menu_item/ItemPrices';
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Switch } from '../ui/switch';
-import { ImageOffIcon } from 'lucide-react';
 export default function MenuItemsByCategory() {
     const { category, menuItems, branch } = usePage<{
         category: MenuCategory;

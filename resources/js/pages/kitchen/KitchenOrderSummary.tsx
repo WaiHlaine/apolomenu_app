@@ -26,7 +26,7 @@ export default function KitchenOrderSummary() {
             </div>
             <div>
                 {summary.map((summary) => (
-                    <OrderSummaryItem summary={summary} />
+                    <OrderSummaryItem key={`${summary.display_name} ${summary.menu_item_name}`} summary={summary} />
                 ))}
             </div>
         </div>

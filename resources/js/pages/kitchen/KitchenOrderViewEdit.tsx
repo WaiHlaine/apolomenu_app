@@ -13,10 +13,7 @@ export default function KitchenOrderViewEdit() {
     }>().props;
     const [showImage, setShowImage] = useState(filters.show_image == 'true' ? true : false);
     const [showSummary, setShowSummary] = useState(filters.show_summary == 'true' ? true : false);
-    console.log({
-        showImage,
-        showSummary,
-    });
+
     const handleToggleShowImage = (checked: boolean) => {
         setShowImage(checked);
         router.reload({

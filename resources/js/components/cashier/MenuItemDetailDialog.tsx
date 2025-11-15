@@ -3,14 +3,13 @@ import { Branch } from '@/types/branch';
 import { MenuItem, MenuItemVariant } from '@/types/menu_item';
 import { Textarea } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
-import { Minus, Plus } from 'lucide-react';
+import { ImageOffIcon, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
 import ItemBadges from '../menu_item/ItemBadges';
 import ItemPrices from '../menu_item/ItemPrices';
 import ItemVariantsSelect from '../menu_item/ItemVariantsSelect';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { ImageOffIcon} from 'lucide-react';
 export default function MenuItemDetailDialog({ item }: { item: MenuItem }) {
     const [notes, setNotes] = useState('');
     const [quantity, setQuantity] = useState(1);

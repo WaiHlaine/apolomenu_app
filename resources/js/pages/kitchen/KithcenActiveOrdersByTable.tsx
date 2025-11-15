@@ -76,7 +76,7 @@ const KitchenTableOrder = ({ table }: { table: TableOrder }) => {
                 </div>
             </div>
             {table.items.map((item) => (
-                <div key={`${item.menu_item_id} ${item.variant_id}`}>
+                <div key={`${item.id} ${item.menu_item_id} ${item.variant_id}`} className="border-b">
                     <div className="flex w-full gap-2 p-3">
                         {filters.show_image == 'true' && (
                             <div>
