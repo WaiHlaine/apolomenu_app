@@ -1,5 +1,6 @@
 // resources/js/Hooks/useAudioPlayer.ts
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface UseAudioPlayer {
     play: () => void;
@@ -31,8 +32,21 @@ export function useAudioPlayer(src: string): UseAudioPlayer {
         };
     }, [src]);
 
-    const play = () => audioRef.current?.play();
+    const play = () => {
+        if (!audioRef.current) return;
+
+        audioRef.current.play().catch((err) => {
+            // Browser blocked audio (no user interaction)
+            if (err.name === 'NotAllowedError') {
+                toast.warning('Sound blocked by browser. Tap anywhere to enable notification audio.');
+            } else {
+                toast.error(`Audio error: ${err.message}`);
+            }
+        });
+    };
+
     const pause = () => audioRef.current?.pause();
+
     const stop = () => {
         if (audioRef.current) {
             audioRef.current.pause();
