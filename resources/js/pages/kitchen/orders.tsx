@@ -1,8 +1,8 @@
 import { ShowFlashMessageToast } from '@/components/ShowFlashToastMessage';
-import { useAudioPlayer } from '@/hooks/use-audio-player';
 import { Branch } from '@/types/branch';
 import { router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
+import { toast } from 'sonner';
 import KitchenOrdersView from './KitchenOrders';
 import KitchenTopBar from './KitchenTopBar';
 
@@ -13,10 +13,12 @@ type KitchenOrdersProps = {
 };
 
 export default function KitchenOrders({ branch }: KitchenOrdersProps) {
-    const { play } = useAudioPlayer('/storage/sounds/new_order.mp3');
     // Echo live updates
     useEcho(`branch.${branch.id}.orders`, 'OrderCreatedEvent', () => {
-        play();
+        // Attempt to play notification sound
+        window.orderAudio.play().catch(() => {
+            toast.warning('Browser blocked the new order sound. Click anywhere to enable audio.');
+        });
         router.reload();
     });
 
