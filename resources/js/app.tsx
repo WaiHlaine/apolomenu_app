@@ -27,3 +27,31 @@ createInertiaApp({
 
 // This will set light / dark mode on load...
 initializeTheme();
+
+let unlocked = false;
+
+declare global {
+    interface Window {
+        orderAudio: HTMLAudioElement;
+    }
+}
+
+window.orderAudio = new Audio('/storage/sounds/new_order.mp3'); // Initialize orderAudio
+
+function unlockAudio() {
+    if (!unlocked) {
+        window.orderAudio
+            .play()
+            .then(() => {
+                unlocked = true;
+                console.log('Audio unlocked for notifications.');
+                window.orderAudio.pause(); // Pause after successful play to reset
+                console.log('Audio unlocked for notifications.');
+            })
+            .catch(() => {});
+
+        document.removeEventListener('click', unlockAudio);
+    }
+}
+
+document.addEventListener('click', unlockAudio);
