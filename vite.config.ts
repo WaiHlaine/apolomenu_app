@@ -26,4 +26,9 @@ export default defineConfig({
             'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
         },
     },
+    //added for low memory use in production build
+    build: {
+        sourcemap: false,
+        minify: 'esbuild',
+    },
 });
