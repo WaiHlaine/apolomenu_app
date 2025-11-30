@@ -1,11 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { useAppearance } from '@/hooks/use-appearance';
+import { useEffectiveAppearance } from '@/hooks/use-effective-appearance';
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export default function KitchenOrderStatusFilterTab() {
-    const { appearance } = useAppearance();
     const {
         filters: { order_type },
     } = usePage<{
@@ -14,6 +13,7 @@ export default function KitchenOrderStatusFilterTab() {
         };
     }>().props;
     const [tab, setTab] = useState<string | undefined>(order_type || 'all');
+    const effectiveAppearance = useEffectiveAppearance();
     const handleTabChange = (value: string | undefined) => {
         setTab(value);
         router.visit(route('kitchen.orders'), {
@@ -23,7 +23,7 @@ export default function KitchenOrderStatusFilterTab() {
         });
     };
     return (
-        <div className={twMerge('flex gap-2 rounded-md p-2', appearance == 'dark' ? 'bg-black' : 'bg-gray-100')}>
+        <div className={twMerge('flex gap-2 rounded-md p-2', effectiveAppearance == 'dark' ? 'bg-black' : 'bg-gray-100')}>
             <Button
                 variant={tab === 'all' ? 'default' : 'ghost'}
                 onClick={() => {
