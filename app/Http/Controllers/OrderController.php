@@ -135,11 +135,11 @@ class OrderController extends Controller
 
             OrderCreatedEvent::dispatch($order);
 
-            return redirect()->route('order.active', [
+            return redirect()->route('branch_menu.index', [
                 'tenant_id' => $table->branch->tenant_id,
                 'branch_id' => $validated['branchId'],
                 'table_public_token' => $table->public_token,
-            ])->with('success', 'Order created successfully.');
+            ])->with('success', 'Your order has been place successfully.');
         });
     }
 
