@@ -69,6 +69,8 @@ export default function ItemDetail() {
         );
     };
 
+    const selectedVariant = menuItem.variants.find((variant) => variant.id == orderItem.variantId);
+    const totalPrice = orderItem.quantity * Number(selectedVariant?.price || 0);
     return (
         <PublicLayout>
             <div className="relative flex h-full flex-col overflow-auto">
@@ -103,6 +105,7 @@ export default function ItemDetail() {
                         onAddToCart={handleAddToCart}
                         enableAddToCart={!menuItem.outOfStock && !!orderItem.variantId}
                         onChange={(value) => handleOrderItemChange('quantity', value)}
+                        totalPrice={totalPrice}
                     />
                 </div>
 

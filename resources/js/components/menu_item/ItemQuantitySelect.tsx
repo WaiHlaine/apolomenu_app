@@ -1,4 +1,5 @@
 import { Minus, Plus } from 'lucide-react';
+import Price from '../common/Price';
 import { Button } from '../ui/button';
 
 export default function ItemQuantitySelect({
@@ -6,11 +7,13 @@ export default function ItemQuantitySelect({
     onChange,
     onAddToCart,
     value,
+    totalPrice,
 }: {
     enableAddToCart: boolean;
     onChange: (value: number) => void;
     onAddToCart: () => void;
     value: number;
+    totalPrice?: number;
 }) {
     return (
         <div className="flex w-full items-center gap-2 rounded-t-2xl border p-4 shadow">
@@ -39,7 +42,10 @@ export default function ItemQuantitySelect({
             </div>
             <div className="flex-grow">
                 <Button onClick={onAddToCart} size={'lg'} disabled={!enableAddToCart} className="w-full">
-                    Add to cart
+                    Add to cart -{' '}
+                    <span>
+                        <Price amount={totalPrice || 0} />
+                    </span>
                 </Button>
             </div>
         </div>
