@@ -4,6 +4,7 @@ import ItemInfo from '@/components/menu_item/ItemInfo';
 import ItemQuantitySelect from '@/components/menu_item/ItemQuantitySelect';
 import ItemSpecialInstructions from '@/components/menu_item/ItemSpecialInstructions';
 import ItemVariantsSelect from '@/components/menu_item/ItemVariantsSelect';
+import { useEffectiveAppearance } from '@/hooks/use-effective-appearance';
 import PublicLayout from '@/layouts/public-layout';
 import { useOrderItemStore } from '@/store/useOrderItemsStore';
 import { Branch } from '@/types/branch';
@@ -12,6 +13,7 @@ import { Table } from '@/types/table';
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
 
 export default function ItemDetail() {
     const { menuItem, branch, table } = usePage().props as unknown as {
@@ -23,6 +25,7 @@ export default function ItemDetail() {
     // ✅ scoped key for cart
     const key = `${branch.id}-${table.id}`;
     const addOrUpdateOrderItem = useOrderItemStore((store) => store.addOrUpdateOrderItem);
+    const appearance = useEffectiveAppearance();
 
     const [orderItem, setOrderItem] = useState({
         menuItemId: menuItem.id,
@@ -68,32 +71,33 @@ export default function ItemDetail() {
 
     return (
         <PublicLayout>
-            <div className="relative h-[100vh]">
-                <div className="border-[0.5px]">
-                    <ItemImage src={menuItem.image} alt={menuItem.translations[0].name} />
-                </div>
+            <div className="relative flex h-full flex-col overflow-auto">
+                <div className="flex-grow">
+                    <div className="border-[0.5px]">
+                        <ItemImage src={menuItem.image} alt={menuItem.translations[0].name} />
+                    </div>
 
-                <ItemInfo
-                    name={menuItem.translations[0].name}
-                    description={menuItem.translations[0].description}
-                    variants={menuItem.variants}
-                    badges={menuItem.badges}
-                    currency={branch.currency.toUpperCase()}
-                />
-
-                {menuItem.variants.length > 1 ? (
-                    <ItemVariantsSelect
-                        onChange={(value) => handleOrderItemChange('variantId', value)}
-                        variants={menuItem.variants}
+                    <ItemInfo
                         name={menuItem.translations[0].name}
+                        description={menuItem.translations[0].description}
+                        variants={menuItem.variants}
+                        badges={menuItem.badges}
+                        currency={branch.currency.toUpperCase()}
                     />
-                ) : (
-                    <div />
-                )}
 
-                <ItemSpecialInstructions value={orderItem.notes} onChange={(value) => handleOrderItemChange('notes', value)} />
+                    {menuItem.variants.length > 1 ? (
+                        <ItemVariantsSelect
+                            onChange={(value) => handleOrderItemChange('variantId', value)}
+                            variants={menuItem.variants}
+                            name={menuItem.translations[0].name}
+                        />
+                    ) : (
+                        <div />
+                    )}
 
-                <div className="absolute right-0 bottom-0 left-0">
+                    <ItemSpecialInstructions value={orderItem.notes} onChange={(value) => handleOrderItemChange('notes', value)} />
+                </div>
+                <div className={twMerge('sticky right-0 bottom-0 left-0', appearance === 'dark' ? 'bg-black' : 'bg-white')}>
                     <ItemQuantitySelect
                         value={orderItem.quantity}
                         onAddToCart={handleAddToCart}

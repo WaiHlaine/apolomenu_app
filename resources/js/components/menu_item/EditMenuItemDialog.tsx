@@ -170,7 +170,7 @@ export default function EditMenuItemDialog() {
                     <DialogTitle>Edit item</DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 overflow-auto">
                     {/* name */}
                     <div>
                         <Label htmlFor="name">Name</Label>

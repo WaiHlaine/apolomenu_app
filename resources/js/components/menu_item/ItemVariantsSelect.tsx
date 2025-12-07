@@ -45,7 +45,7 @@ export default function ItemVariantsSelect({
                                     <Badge variant={'secondary'}>Out of stock</Badge>
                                 </div>
                             ) : (
-                                <Label htmlFor={variant.id.toString()} className="text-[16px] capitalize">
+                                <Label htmlFor={variant.id.toString()} className="text-[16px] font-bold capitalize">
                                     {variant.name.toString()}
                                 </Label>
                             )}
