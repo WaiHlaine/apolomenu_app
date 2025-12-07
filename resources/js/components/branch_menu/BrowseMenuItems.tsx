@@ -35,7 +35,7 @@ export default function BrowseMenuItems() {
     };
 
     return (
-        <div>
+        <div className="flex-grow">
             <div className="flex items-center justify-between p-4">
                 <p className="text-sm font-semibold">{category?.name}</p>
 

@@ -33,7 +33,7 @@ export default function OrderCart() {
     };
 
     return (
-        <div onClick={goToCart} className="w-full border-t bg-white p-4 shadow">
+        <div onClick={goToCart} className="sticky right-0 bottom-0 left-0 w-full border-t bg-white p-4 shadow-card">
             <Button className="flex w-full items-center justify-between">
                 <div className="flex items-center gap-1">
                     <ShoppingCart />

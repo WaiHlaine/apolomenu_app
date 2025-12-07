@@ -21,7 +21,7 @@ export default function BackToMenus() {
     };
     return (
         <div>
-            <Button variant={'ghost'} onClick={handleBackClick} size={'sm'}>
+            <Button variant={'outline'} onClick={handleBackClick} size={'sm'}>
                 <ChevronLeft />
                 Back
             </Button>

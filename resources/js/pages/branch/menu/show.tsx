@@ -9,7 +9,7 @@ import { useOrderItemStore } from '@/store/useOrderItemsStore';
 import { Branch } from '@/types/branch';
 import { MenuItem } from '@/types/menu_item';
 import { Table } from '@/types/table';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -54,7 +54,16 @@ export default function ItemDetail() {
             price: parseFloat(selectedVariant.price), // ✅ store price
         });
 
-        toast.success('Item added to cart');
+        //navigate back to the current category
+        router.get(
+            route('branch_menu.index', {
+                tenant_id: branch.tenantId,
+                branch_id: branch.id,
+                table_public_token: table.publicToken,
+            }),
+            { category_id: menuItem.categoryId },
+            { preserveScroll: true, preserveState: true },
+        );
     };
 
     return (
@@ -76,7 +85,6 @@ export default function ItemDetail() {
                     <ItemVariantsSelect
                         onChange={(value) => handleOrderItemChange('variantId', value)}
                         variants={menuItem.variants}
-                        currency={branch.currency.toUpperCase()}
                         name={menuItem.translations[0].name}
                     />
                 ) : (

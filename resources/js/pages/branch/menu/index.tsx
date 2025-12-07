@@ -8,13 +8,11 @@ import PublicLayout from '@/layouts/public-layout';
 export default function BranchMenus() {
     return (
         <PublicLayout>
-            <div className="relative h-[100vh]">
+            <div className="relative flex h-full flex-col overflow-y-auto">
                 <BranchInfo />
                 <MenuCategoriesNavList />
                 <BrowseMenuItems />
-                <div className="sticky right-0 bottom-0 left-0">
-                    <OrderCart />
-                </div>
+                <OrderCart />
                 <RequestActionsAndOrderHisotry />
             </div>
         </PublicLayout>

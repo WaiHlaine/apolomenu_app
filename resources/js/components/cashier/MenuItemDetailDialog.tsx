@@ -95,12 +95,7 @@ export default function MenuItemDetailDialog({ item }: { item: MenuItem }) {
                         </div>
                         <div className="mt-4">
                             {item.variants.length > 1 && (
-                                <ItemVariantsSelect
-                                    onChange={setVariant}
-                                    name={item.translations[0]?.name}
-                                    currency={branch.currency}
-                                    variants={item.variants}
-                                />
+                                <ItemVariantsSelect onChange={setVariant} name={item.translations[0]?.name} variants={item.variants} />
                             )}
                         </div>
                         <div className="mt-6 mb-[100px]">
