@@ -3,7 +3,7 @@ import { orderTypes } from '@/lib/utils';
 import { Branch } from '@/types/branch';
 import { Order } from '@/types/order';
 import { Table } from '@/types/table';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import { CheckIcon, ImageOffIcon, LoaderIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -24,7 +24,6 @@ export default function TableDetailDialog() {
     }>().props;
     const [open, setOpen] = useState(!!filters.table);
 
-    console.log({ filters, tableOrders });
     useEffect(() => {
         if (filters.table) {
             setOpen(true);
@@ -42,7 +41,19 @@ export default function TableDetailDialog() {
         true, // initial value is important
     );
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(opened) => {
+                if (!opened) {
+                    router.reload({
+                        data: {
+                            table: undefined,
+                        },
+                    });
+                }
+                setOpen(opened);
+            }}
+        >
             <DialogContent className="w-[60vw] p-0">
                 <DialogHeader>
                     <DialogTitle className="border-b p-4">Table Detail</DialogTitle>

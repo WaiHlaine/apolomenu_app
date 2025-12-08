@@ -82,7 +82,7 @@ export default function AddNewOrderDialog() {
             <DialogContent className="max-h-[95vh] min-h-[60vh] min-w-full p-0">
                 <div className="flex items-center gap-2 border-b px-6 py-4">
                     <div className="rounded-md bg-blue-600 p-2">
-                        <span className="font-bold text-white">{table.name}</span>
+                        <span className="font-bold text-white">{table?.name}</span>
                     </div>
                     <div>
                         <p>
