@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Enums\SessionKeys;
+use App\Events\TableCompletedEvent;
 use App\Http\Resources\BranchResource;
 use App\Http\Resources\MenuCategoryResource;
 use App\Http\Resources\MenuItemResource;
@@ -286,8 +287,10 @@ class CashierController extends Controller
 
     public function payBill(string $id)
     {
+
         DB::transaction(function () use ($id) {
             // Get all orders for this table
+            $table = Table::findOrFail($id);
             $orders = Order::where('table_id', $id)->get();
 
             if ($orders->isEmpty()) {
@@ -306,6 +309,8 @@ class CashierController extends Controller
                 ->update([
                     'status' => OrderItemStatus::Served->value,
                 ]);
+
+            TableCompletedEvent::dispatch($table);
         });
 
         return back()->with('success', 'Bill has been paid successfully.');

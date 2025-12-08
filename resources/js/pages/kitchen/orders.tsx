@@ -21,6 +21,10 @@ export default function KitchenOrders({ branch }: KitchenOrdersProps) {
         router.reload();
     });
 
+    useEcho(`branch.${branch.id}.table_completed`, 'TableCompletedEvent', () => {
+        router.reload();
+    });
+
     return (
         <div className="flex w-[100vw] flex-col">
             <KitchenTopBar />

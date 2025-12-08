@@ -2,11 +2,19 @@ import CreateNewOrderButton from '@/components/cashier/CreateNewOrder';
 import TableDetailDialog from '@/components/cashier/TableDetailDialog';
 import TableStatus from '@/components/cashier/TableStatus';
 import AppLayout from '@/layouts/app-layout';
+import { Branch } from '@/types/branch';
 import { Table } from '@/types/table';
 import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 
 export default function Tables() {
-    const { tables } = usePage<{ tables: Table[] }>().props;
+    const { tables, branch } = usePage<{
+        tables: Table[];
+        branch: Branch;
+    }>().props;
+    useEcho(`branch.${branch.id}.orders`, 'OrderCreatedEvent', () => {
+        router.reload();
+    });
 
     return (
         <AppLayout>
