@@ -17,9 +17,14 @@ export default function AddedOrderItems({ tableId, orderType }: { tableId?: stri
             table: string;
         };
     }>().props;
+    console.log({
+        tableId,
+        table,
+        orderType,
+    });
     const { appearance } = useAppearance();
     const allOrders = useCashierOrderItemStore((store) => store.orders);
-    const uniqueKey = `${branch.id}-${tableId || table}`;
+    const uniqueKey = `${branch.id}`;
     const orders = allOrders[uniqueKey];
     const clearOrder = useCashierOrderItemStore((store) => store.clearOrder);
     const addOrUpdateOrderItem = useCashierOrderItemStore((store) => store.addOrUpdateOrderItem);

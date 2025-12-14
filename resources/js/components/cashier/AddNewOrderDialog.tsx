@@ -139,10 +139,7 @@ const OrderableMenuItem = ({ item }: { item: MenuItem }) => {
     const [notes, setNotes] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [variant, setVariant] = useState(item.variants[0].id.toString());
-    const {
-        branch,
-        filters: { table },
-    } = usePage<{
+    const { branch } = usePage<{
         branch: Branch;
         filters: {
             table: string;
@@ -157,7 +154,7 @@ const OrderableMenuItem = ({ item }: { item: MenuItem }) => {
         }
     };
     const selectedVariant = item.variants.find((v) => v.id.toString() == variant);
-    const orderUniqueKey = `${branch.id}-${table}`;
+    const orderUniqueKey = `${branch.id}`;
     const addOrUpdateOrderItem = useCashierOrderItemStore((store) => store.addOrUpdateOrderItem);
     const [open, setOpen] = useState(false);
     const handleAddToCartClick = (menuItem: MenuItem, variant: MenuItemVariant) => {

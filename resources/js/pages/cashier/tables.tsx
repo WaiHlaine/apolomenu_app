@@ -44,11 +44,11 @@ export default function Tables() {
                                     });
                                 }}
                                 key={table.id}
-                                className={`flex aspect-square items-center justify-center rounded-2xl text-center text-lg font-medium shadow transition duration-200 ${
+                                className={`flex aspect-square cursor-pointer items-center justify-center rounded-2xl text-center text-lg font-medium shadow transition duration-200 ${
                                     isAvailable ? 'bg-white text-gray-800 hover:shadow-md' : 'bg-yellow-300 text-gray-800 hover:brightness-95'
                                 } `}
                             >
-                                {table.name}
+                                <span className="text-lg font-bold">{table.name}</span>
                             </div>
                         );
                     })}

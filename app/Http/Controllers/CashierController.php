@@ -50,13 +50,17 @@ class CashierController extends Controller
                 return $table;
             });
 
+        $currentActiveTableOrders = $tableId ? Order::where('table_id', $tableId)->whereNotIn('status', [OrderStatus::Completed->value])->get() : [];
+
         $tableOrders = $tableId ? Order::with([
             'items',
             'items.variant',
             'items.menuItem',
             'items.menuItem.translations',
-            // 'items.menuItem.variants',
-        ])->where('table_id', $tableId)->whereNotIn('status', [OrderStatus::Completed->value])->get() : [];
+        ])->where('table_id', $tableId)->whereNotIn('status', [OrderStatus::Completed->value]
+        )
+            ->whereIn('id', $currentActiveTableOrders->pluck('id'))
+            ->get() : [];
 
         return Inertia::render('cashier/tables', [
             'tableOrders' => OrderResource::collection($tableOrders),
