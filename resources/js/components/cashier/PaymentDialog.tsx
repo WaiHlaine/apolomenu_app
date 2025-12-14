@@ -2,12 +2,13 @@ import { orderTypes } from '@/lib/utils';
 import { Branch } from '@/types/branch';
 import { Order } from '@/types/order';
 import { Table } from '@/types/table';
-import { router, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
-import { CheckCircle2Icon, CircleDollarSignIcon, DollarSign, ImageOffIcon } from 'lucide-react';
+import { CheckCircle2Icon, DollarSign, ImageOffIcon } from 'lucide-react';
 import Price from '../common/Price';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import PayNowDialog from './PayNowDialog';
 
 export default function PaymentDialog() {
     const { tableOrders, table, branch } = usePage<{
@@ -20,8 +21,9 @@ export default function PaymentDialog() {
     }>().props;
 
     const firstOrder = tableOrders[0];
-    const tableOrderTotal = tableOrders.reduce((acc, order) => acc + (Number(order.subtotal) || 0), 0);
+    const tableOrderSubTotal = tableOrders.reduce((acc, order) => acc + (Number(order.subtotal) || 0), 0);
     const tableOrderTax = tableOrders.reduce((acc, order) => acc + (Number(order.tax) || 0), 0);
+    const talbeOrderTotal = tableOrderSubTotal + tableOrderTax;
 
     return (
         <Dialog>
@@ -103,7 +105,7 @@ export default function PaymentDialog() {
                         <div className="sticky right-0 bottom-0 left-0 w-full rounded-md bg-gray-100 px-8 py-3 shadow">
                             <div className="flex items-center justify-between text-sm">
                                 <span>Subtotal</span>
-                                <Price amount={tableOrderTotal} className="font-semibold" />
+                                <Price amount={tableOrderSubTotal} className="font-semibold" />
                             </div>
                             <div className="mt-4 mb-5 flex items-center justify-between border-b border-dashed">
                                 <span>Tax {branch.tax}%</span>
@@ -111,7 +113,7 @@ export default function PaymentDialog() {
                             </div>
                             <div className="flex items-center justify-between">
                                 <span>Total</span>
-                                <Price amount={tableOrderTotal + tableOrderTax} className="font-semibold" />
+                                <Price amount={talbeOrderTotal} className="font-semibold" />
                             </div>
                         </div>
                     </div>
@@ -126,15 +128,13 @@ export default function PaymentDialog() {
                             </div>
                         </div>
                         <div className="mt-6">
-                            <Button
-                                className="w-full"
-                                onClick={() => {
-                                    router.post(route('cashier.tables.pay_bill', table.id));
-                                }}
-                            >
-                                <CircleDollarSignIcon />
-                                Pay now
-                            </Button>
+                            <PayNowDialog
+                                tableId={table.id}
+                                subTotalAmount={tableOrderSubTotal}
+                                totalAmount={talbeOrderTotal}
+                                taxAmount={tableOrderTax}
+                                paymentMethod="cash"
+                            />
                         </div>
                     </div>
                 </div>

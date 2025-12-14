@@ -48,13 +48,6 @@ export default function AddNewOrderDialog() {
     const clearOrders = useCashierOrderItemStore((store) => store.clearOrder);
     const firstOrder = tableOrders[0];
 
-    console.log({
-        filters,
-        category,
-        menuItems,
-        categories,
-    });
-
     useEffect(() => {
         if (categories && categories.length > 0 && !filters.categoryId) {
             router.reload({

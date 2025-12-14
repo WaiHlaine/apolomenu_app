@@ -317,6 +317,8 @@ class CashierController extends Controller
             TableCompletedEvent::dispatch($table);
         });
 
-        return back()->with('success', 'Bill has been paid successfully.');
+        return back()->with('success', 'Bill has been paid successfully.', [
+            'table' => null,
+        ]);
     }
 }
