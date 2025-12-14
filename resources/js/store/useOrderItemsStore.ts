@@ -27,6 +27,7 @@ type OrderItemStore = {
     clearOrder: (key: OrderContextKey) => void;
     getTotalAmount: (key: OrderContextKey) => number;
     setSession: (key: OrderContextKey, session: OrderSession) => void;
+    clearAllOrders: () => void;
     clearSession: (key: OrderContextKey) => void;
 };
 
@@ -72,6 +73,13 @@ export const useOrderItemStore = create<OrderItemStore>()(
                 set((state) => ({
                     sessions: { ...state.sessions, [key]: session },
                 })),
+
+            /** 🔥 ADD THIS */
+            clearAllOrders: () =>
+                set({
+                    orders: {},
+                    sessions: {},
+                }),
 
             clearSession: (key) =>
                 set((state) => {

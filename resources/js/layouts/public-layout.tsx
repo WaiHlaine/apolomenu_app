@@ -1,10 +1,13 @@
+import { useBasketUnloadWarning } from '@/components/branch_menu/hooks/useBasketUnloadWarning';
 import { ShowFlashMessageToast } from '@/components/ShowFlashToastMessage';
 import { Toaster } from '@/components/ui/sonner';
 import { AlertTriangleIcon, CheckCircle, InfoIcon, LoaderCircle, TriangleAlertIcon, XIcon } from 'lucide-react';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
+    useBasketUnloadWarning();
     document.documentElement.classList.toggle('dark', false);
     document.documentElement.style.colorScheme = 'light';
+
     return (
         <div className="h-[100vh] w-full">
             {children}
