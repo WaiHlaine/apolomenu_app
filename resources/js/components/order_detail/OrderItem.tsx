@@ -2,6 +2,7 @@ import { MenuItem } from '@/types/menu_item';
 import { OrderItem as TOrderItem } from '@/types/order';
 import ImageView from '../ImageView';
 import Price from '../common/Price';
+import OrderItemStatusBadge from './OrderItemStatusBadge';
 
 export default function OrderItem({ orderItem, menuItem }: { orderItem: TOrderItem; menuItem?: MenuItem; currency: string }) {
     const selectedVariant = menuItem?.variants.find((variant) => variant.id === orderItem.variantId);
@@ -16,7 +17,7 @@ export default function OrderItem({ orderItem, menuItem }: { orderItem: TOrderIt
                 </div>
                 <div className="">
                     <div className="mt-2 flex items-center justify-between">
-                        <p className="text-sm font-medium text-muted-foreground">x{orderItem.quantity}</p>
+                        <p className="text-lg font-semibold text-muted-foreground">{orderItem.quantity}</p>
                         <Price className="font-semibold" amount={orderItem.totalPrice} />
                     </div>
                     {orderItem.notes && (
@@ -25,6 +26,15 @@ export default function OrderItem({ orderItem, menuItem }: { orderItem: TOrderIt
                             <span>{orderItem.notes}</span>
                         </p>
                     )}
+                    <div>
+                        <span className="text-sm text-muted-foreground">Unit Price: </span>
+                        <Price className="text-sm text-muted-foreground" amount={orderItem.unitPrice} />
+                    </div>
+                    {/* status */}
+                    <div>
+                        <span className="text-sm text-muted-foreground">Status: </span>
+                        <OrderItemStatusBadge status={orderItem.status} />
+                    </div>
                 </div>
             </div>
         </div>
