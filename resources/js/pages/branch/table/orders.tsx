@@ -62,7 +62,7 @@ export default function TableOrders() {
                                     <Price amount={totals['subtotal']} className="text-sm" />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm">Tax ({`${branch.tax}%`})</span>
+                                    <span className="text-sm">Tax</span>
                                     <Price amount={tableOrderTaxTotal} className="text-sm" />
                                 </div>
                             </div>

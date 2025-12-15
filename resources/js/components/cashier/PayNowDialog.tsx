@@ -10,12 +10,14 @@ export default function PayNowDialog({
     subTotalAmount,
     paymentMethod = 'cash',
     tableId,
+    canPayNow = true,
 }: {
     totalAmount?: number;
     taxAmount?: number;
     subTotalAmount?: number;
     paymentMethod?: string;
     tableId: number;
+    canPayNow?: boolean;
 }) {
     console.log({ totalAmount, taxAmount, subTotalAmount, paymentMethod });
     const handlePayNow = () => {
@@ -31,7 +33,7 @@ export default function PayNowDialog({
     };
     return (
         <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger disabled={!canPayNow} asChild>
                 <Button className="w-full">
                     <DollarSignIcon className="mr-2 h-4 w-4" />
                     Pay Now

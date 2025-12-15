@@ -5,22 +5,24 @@ import { Order } from '@/types/order';
 import { Table } from '@/types/table';
 import { router, usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
-import { ImageOffIcon, LoaderIcon } from 'lucide-react';
+import { ImageOffIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import Price from '../common/Price';
+import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import AddNewOrderDialog from './AddNewOrderDialog';
 import PaymentDialog from './PaymentDialog';
 export default function TableDetailDialog() {
     const { appearance } = useAppearance();
-    const { filters, tableOrders, table, branch } = usePage<{
+    const { filters, tableOrders, table, isTableOrdersInProgress } = usePage<{
         filters: {
             table: string;
         };
         tableOrders: Order[];
         table: Table;
         branch: Branch;
+        isTableOrdersInProgress: boolean;
     }>().props;
     const [open, setOpen] = useState(!!filters.table);
 
@@ -36,10 +38,6 @@ export default function TableDetailDialog() {
     const tableOrderTotal = tableOrders.reduce((acc, order) => acc + (Number(order.total) || 0), 0);
     const tableOrderSubTotal = tableOrders.reduce((acc, order) => acc + (Number(order.subtotal) || 0), 0);
     const tableOrderTaxTotal = tableOrders.reduce((acc, order) => acc + (Number(order.tax) || 0), 0);
-    const allServed = tableOrders.reduce(
-        (acc, order) => acc && (order.status ?? '').toLowerCase().trim() === 'served',
-        true, // initial value is important
-    );
     return (
         <Dialog
             open={open}
@@ -77,23 +75,15 @@ export default function TableDetailDialog() {
                                     </p>
                                 </div>
                             </div>
-                            <div
-                                className={twMerge(
-                                    'flex items-center justify-between gap-6',
-                                    allServed ? 'text-green-500' : 'rounded-lg border px-3 py-2 text-sm text-yellow-700',
-                                )}
-                            >
-                                {!allServed && (
-                                    <>
-                                        <div className="flex items-center gap-2">
-                                            <LoaderIcon size={16} />
-                                            <span>Serving</span>
-                                        </div>
-                                        <div>
-                                            <span>{totalItems} items</span>
-                                        </div>
-                                    </>
-                                )}
+                            <div className={twMerge('flex items-center justify-between gap-6 rounded-lg border px-3 py-2 text-sm text-yellow-700')}>
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <span>Serving</span>
+                                    </div>
+                                    <div>
+                                        <span>{totalItems} items</span>
+                                    </div>
+                                </>
                             </div>
                         </div>
                         {/* <pre>{JSON.stringify(tableOrders, null, 2)}</pre> */}
@@ -165,7 +155,7 @@ export default function TableDetailDialog() {
 
                         {firstOrder && (
                             <div className="flex items-center justify-between px-6 py-2">
-                                <p className="font-bold">Tax ({branch.tax}%)</p>
+                                <p className="font-bold">Tax</p>
                                 <p className="font-bold">
                                     <span></span>
                                     <Price amount={tableOrderTaxTotal} className="font-bold" />
@@ -188,7 +178,11 @@ export default function TableDetailDialog() {
                             </div>
                             {firstOrder && (
                                 <div className="flex-grow">
-                                    <PaymentDialog />
+                                    {isTableOrdersInProgress ? (
+                                        <Button className="w-full cursor-not-allowed bg-gray-300 text-white hover:bg-gray-300">Processing...</Button>
+                                    ) : (
+                                        <PaymentDialog />
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -11,13 +11,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import PayNowDialog from './PayNowDialog';
 
 export default function PaymentDialog() {
-    const { tableOrders, table, branch } = usePage<{
+    const { tableOrders, table, branch, isTableOrdersInProgress } = usePage<{
         filters: {
             table: string;
         };
         tableOrders: Order[];
         table: Table;
         branch: Branch;
+        isTableOrdersInProgress: boolean;
     }>().props;
 
     const firstOrder = tableOrders[0];
@@ -134,6 +135,7 @@ export default function PaymentDialog() {
                                 totalAmount={talbeOrderTotal}
                                 taxAmount={tableOrderTax}
                                 paymentMethod="cash"
+                                canPayNow={!isTableOrdersInProgress}
                             />
                         </div>
                     </div>

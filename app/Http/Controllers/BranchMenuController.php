@@ -41,7 +41,7 @@ class BranchMenuController extends Controller
         // ✅ count of active orders for this table
         $activeOrderCount = Order::where('branch_id', $branch_id)
             ->where('table_id', $table->id)
-            ->whereIn('status', ['pending', 'preparing', 'in_progress']) // adjust based on your statuses
+            ->whereNull('paid_at') // adjust based on your statuses
             ->count();
 
         $categoryId = $request->query('category_id');

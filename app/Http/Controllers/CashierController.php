@@ -37,7 +37,7 @@ class CashierController extends Controller
             ->map(function ($table) {
                 // Check if the table has an ongoing order
                 $hasActiveOrder = Order::where('table_id', $table->id)
-                    ->whereNotIn('status', [OrderStatus::Completed->value])
+                    ->whereNull('paid_at')
                     ->exists();
 
                 // Determine status
@@ -50,21 +50,28 @@ class CashierController extends Controller
                 return $table;
             });
 
-        $currentActiveTableOrders = $tableId ? Order::where('table_id', $tableId)->whereNotIn('status', [OrderStatus::Completed->value])->get() : [];
-
+        $currentActiveTableOrders = $tableId ? Order::where('table_id', $tableId)
+            ->whereNull('paid_at')
+            ->get() : [];
+        $isTableOrdersInProgress = $tableId ? Order::where('table_id', $tableId)
+            ->whereNull('paid_at')
+            ->whereNotIn('status', [OrderStatus::Completed->value])
+            ->exists()
+             : false;
         $tableOrders = $tableId ? Order::with([
             'items',
             'items.variant',
             'items.menuItem',
             'items.menuItem.translations',
-        ])->where('table_id', $tableId)->whereNotIn('status', [OrderStatus::Completed->value]
-        )
+        ])->where('table_id', $tableId)
+            ->whereNull('paid_at')
             ->whereIn('id', $currentActiveTableOrders->pluck('id'))
             ->get() : [];
 
         return Inertia::render('cashier/tables', [
             'tableOrders' => OrderResource::collection($tableOrders),
             'table' => $tableId ? TableResource::make(Table::findOrFail($tableId)) : null,
+            'isTableOrdersInProgress' => $isTableOrdersInProgress,
             'tables' => TableResource::collection($tables),
             'notifications' => Inertia::optional(fn () => $showNotifications == 'true' ?
             RequestActionTableRequestResource::collection(RequestActionTableRequest::with([

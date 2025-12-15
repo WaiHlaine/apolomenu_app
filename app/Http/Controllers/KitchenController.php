@@ -187,18 +187,18 @@ class KitchenController extends Controller
             // Get all active (non-completed, non-cancelled) orders for the table
             $orders = Order::with(['items', 'table'])
                 ->where('table_id', $tableId)
-                ->whereNotIn('status', [OrderStatus::Ready->value, OrderStatus::Cancelled->value])
+                ->whereNull('paid_at')
+                // ->whereNotIn('status', [OrderStatus::Ready->value, OrderStatus::Cancelled->value])
                 ->lockForUpdate()
                 ->get();
 
             foreach ($orders as $order) {
-                // Mark all non-ready and non-cancelled items as ready
+                // Mark all order items as completed
                 $order->items()
-                    ->whereNotIn('status', [OrderItemStatus::Ready->value, OrderItemStatus::Cancelled->value])
-                    ->update(['status' => OrderItemStatus::Ready->value]);
+                    ->update(['status' => OrderItemStatus::Completed->value]);
 
                 // Update order status to completed
-                $order->update(['status' => OrderStatus::Ready->value]);
+                $order->update(['status' => OrderStatus::Completed->value]);
             }
 
         });
