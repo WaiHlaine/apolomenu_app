@@ -350,7 +350,7 @@ class OrderController extends Controller
         // Load active orders for this table
         $activeOrders = Order::with('items.menuItem.translations', 'items.menuItem.variants', 'items.menuItem.badges') // eager load relations
             ->where('table_id', $table->id)
-            ->whereNotIn('status', [OrderStatus::Completed]) // active statuses
+            ->whereNull('paid_at') // active statuses
             ->get();
 
         // Calculate aggregated totals

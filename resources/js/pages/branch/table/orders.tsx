@@ -6,10 +6,11 @@ import PublicLayout from '@/layouts/public-layout';
 import { Branch } from '@/types/branch';
 import { Order } from '@/types/order';
 import { Table } from '@/types/table';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 
 export default function TableOrders() {
-    const { orders, branch, totals } = usePage<{
+    const { orders, branch, totals, table } = usePage<{
         orders: Order[];
         totals: {
             [key: string]: number;
@@ -17,7 +18,28 @@ export default function TableOrders() {
         branch: Branch;
         table: Table;
     }>().props;
+
     const tableOrderTaxTotal = orders.reduce((acc, order) => acc + (Number(order.tax) || 0), 0);
+
+    useEcho(
+        `branch.${branch.id}.${table.id}.order_item_status_changed`,
+        'OrderItemStatusChangedEvent',
+        () => {
+            router.reload();
+        },
+        undefined,
+        'public',
+    );
+
+    useEcho(
+        `branch.${branch.id}.${table.id}.order_completed`,
+        'OrderCompletedEvent',
+        () => {
+            router.reload();
+        },
+        undefined,
+        'public',
+    );
 
     return (
         <PublicLayout>
@@ -34,8 +56,8 @@ export default function TableOrders() {
                             })}
                         </div>
                         <div className="bg-gray-100 p-3">
-                            <div className="border-b py-3 text-muted-foreground">
-                                <div className="flex items-center justify-between">
+                            <div className="mb-4 border-b py-3 text-muted-foreground">
+                                <div className="mb-4 flex items-center justify-between">
                                     <span className="text-sm">Sub total</span>
                                     <Price amount={totals['subtotal']} className="text-sm" />
                                 </div>
@@ -45,8 +67,8 @@ export default function TableOrders() {
                                 </div>
                             </div>
                             <div className="flex items-center justify-between py-3">
-                                <span className="text-sm font-medium">Total</span>
-                                <Price amount={totals['total']} className="text-sm font-medium" />
+                                <span className="text-lg font-semibold">Total</span>
+                                <Price amount={totals['total']} className="text-lg font-medium" />
                             </div>
                         </div>
                         <SelectPaymentMethod />

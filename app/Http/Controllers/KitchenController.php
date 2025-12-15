@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Enums\SessionKeys;
+use App\Events\OrderCompletedEvent;
+use App\Events\OrderItemStatusChangedEvent;
 use App\Http\Resources\BranchResource;
 use App\Models\Branch;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -122,7 +125,8 @@ class KitchenController extends Controller
 
     public function completeOrder(string $id)
     {
-        $order = Order::with('items')->findOrFail($id);
+        $order = Order::with(['items', 'table'])->findOrFail($id);
+        dd($order->table);
 
         // Update all order items to "Ready" (if not cancelled)
         $order->items()
@@ -136,6 +140,8 @@ class KitchenController extends Controller
             'status' => OrderStatus::Ready->value,
         ]);
 
+        OrderCompletedEvent::dispatch($order->table);
+
         return redirect()
             ->route('kitchen.orders')
             ->with([
@@ -145,7 +151,8 @@ class KitchenController extends Controller
 
     public function completeOrderItem(string $id)
     {
-        $orderItem = OrderItem::findOrFail($id);
+        $orderItem = OrderItem::with(['order', 'order.table'])
+            ->findOrFail($id);
 
         $orderItem->update([
             'status' => OrderItemStatus::Ready->value,
@@ -161,7 +168,10 @@ class KitchenController extends Controller
             $order->update([
                 'status' => OrderStatus::Ready->value,
             ]);
+            OrderCompletedEvent::dispatch($order->table);
         }
+
+        OrderItemStatusChangedEvent::dispatch($order->table);
 
         return redirect()
             ->route('kitchen.orders')
@@ -170,9 +180,12 @@ class KitchenController extends Controller
 
     public function completeTableOrders(string $tableId)
     {
+
+        $table = Table::findOrFail($tableId);
+        OrderCompletedEvent::dispatch($table);
         DB::transaction(function () use ($tableId) {
             // Get all active (non-completed, non-cancelled) orders for the table
-            $orders = Order::with('items')
+            $orders = Order::with(['items', 'table'])
                 ->where('table_id', $tableId)
                 ->whereNotIn('status', [OrderStatus::Ready->value, OrderStatus::Cancelled->value])
                 ->lockForUpdate()
@@ -187,6 +200,7 @@ class KitchenController extends Controller
                 // Update order status to completed
                 $order->update(['status' => OrderStatus::Ready->value]);
             }
+
         });
 
         return redirect()
