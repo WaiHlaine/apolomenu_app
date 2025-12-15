@@ -2,6 +2,7 @@ import Price from '@/components/common/Price';
 import BackToMenus from '@/components/menu_item/BackToMenus';
 import OrderItem from '@/components/order_detail/OrderItem';
 import SelectPaymentMethod from '@/components/order_detail/SelectPaymentMethod';
+import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import { Branch } from '@/types/branch';
 import { Order } from '@/types/order';
@@ -10,13 +11,14 @@ import { router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 
 export default function TableOrders() {
-    const { orders, branch, totals, table } = usePage<{
+    const { orders, branch, totals, table, hasInProgressOrders } = usePage<{
         orders: Order[];
         totals: {
             [key: string]: number;
         };
         branch: Branch;
         table: Table;
+        hasInProgressOrders: boolean;
     }>().props;
 
     const tableOrderTaxTotal = orders.reduce((acc, order) => acc + (Number(order.tax) || 0), 0);
@@ -71,7 +73,13 @@ export default function TableOrders() {
                                 <Price amount={totals['total']} className="text-lg font-medium" />
                             </div>
                         </div>
-                        <SelectPaymentMethod />
+                        {hasInProgressOrders ? (
+                            <Button disabled className="mt-4 w-full">
+                                Please wait, your order is being prepared
+                            </Button>
+                        ) : (
+                            <SelectPaymentMethod />
+                        )}
                     </>
                 ) : (
                     <div className="p-4 text-center">

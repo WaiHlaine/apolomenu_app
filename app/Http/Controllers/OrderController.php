@@ -352,6 +352,8 @@ class OrderController extends Controller
             ->where('table_id', $table->id)
             ->whereNull('paid_at') // active statuses
             ->get();
+        $hasInProgressOrders = Order::where('table_id', $table->id)
+            ->whereNull('paid_at')->whereNotIn('status', [OrderStatus::Completed->value])->exists();
 
         // Calculate aggregated totals
         $totals = [
@@ -366,6 +368,7 @@ class OrderController extends Controller
             'table' => TableResource::make($table),
             'branch' => BranchResource::make($table->branch),
             'totals' => $totals, // ✅ send totals to frontend
+            'hasInProgressOrders' => $hasInProgressOrders,
         ]);
     }
 }
