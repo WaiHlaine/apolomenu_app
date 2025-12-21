@@ -17,6 +17,7 @@ import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import CurrencySymbol from '../common/CurrencySymbol';
 import ImageUpload from '../ImageUpload';
 import { Textarea } from '../ui/textarea';
 
@@ -63,10 +64,14 @@ const formSchema = z
 
 export default function AddNewMenuItemDialog() {
     const [openDialog, setOpenDialog] = useState(false);
-    const { badges = [] } = usePage().props as unknown as {
+    const { badges = [], currency } = usePage().props as unknown as {
         badges: Badge[];
+        currency: string;
     };
 
+    console.log({
+        currency,
+    });
     const [variants, setVariants] = useState<Variant[]>([]);
     const { id } = route().params as { id: string };
 
@@ -174,7 +179,10 @@ export default function AddNewMenuItemDialog() {
                         {variants.length === 0 ? (
                             <div>
                                 <Label htmlFor="price">Price</Label>
-                                <Input type="number" id="price" {...form.register('price')} placeholder="eg. 9.99" />
+                                <div className="flex">
+                                    <Input type="number" id="price" {...form.register('price')} placeholder="eg. 9.99" />
+                                    <CurrencySymbol currency={currency} className="ml-2" />
+                                </div>
                             </div>
                         ) : (
                             <div className="flex flex-col gap-2">
@@ -195,6 +203,7 @@ export default function AddNewMenuItemDialog() {
                                             value={variant.price}
                                             onChange={(e) => updateVariant(index, 'price', e.target.value)}
                                         />
+                                        <CurrencySymbol currency={currency} />
                                         <Button type="button" size="icon" variant="ghost" onClick={() => removeVariant(index)}>
                                             <Trash2Icon className="text-red-500" size={16} />
                                         </Button>
