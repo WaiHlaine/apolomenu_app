@@ -12,6 +12,7 @@ import Price from '../common/Price';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import AddNewOrderDialog from './AddNewOrderDialog';
+import EditOrderDialog from './EditOrderDialog';
 import PaymentDialog from './PaymentDialog';
 export default function TableDetailDialog() {
     const { appearance } = useAppearance();
@@ -33,6 +34,7 @@ export default function TableDetailDialog() {
             setOpen(false);
         }
     }, [filters]);
+
     const firstOrder = tableOrders[0];
     const totalItems = tableOrders.reduce((acc, order) => acc + (order.items?.length || 0), 0);
     const tableOrderTotal = tableOrders.reduce((acc, order) => acc + (Number(order.total) || 0), 0);
@@ -173,9 +175,7 @@ export default function TableDetailDialog() {
                         )}
 
                         <div className="flex w-full items-center gap-2 px-6 py-4">
-                            <div className="flex-grow">
-                                <AddNewOrderDialog />
-                            </div>
+                            <div className="flex-grow">{isTableOrdersInProgress ? <EditOrderDialog /> : <AddNewOrderDialog />}</div>
                             {firstOrder && (
                                 <div className="flex-grow">
                                     {isTableOrdersInProgress ? (

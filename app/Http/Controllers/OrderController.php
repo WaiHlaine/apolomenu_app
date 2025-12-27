@@ -371,4 +371,106 @@ class OrderController extends Controller
             'hasInProgressOrders' => $hasInProgressOrders,
         ]);
     }
+
+    public function replaceTableOrderItems(
+        StoreOrderByCashierRequest $request,
+        Table $table
+    ) {
+        $validated = $request->validated();
+
+        // dd($validated);
+
+        DB::transaction(function () use ($validated, $table) {
+
+            // 1️⃣ Load all unpaid orders for table
+            $orders = Order::where('table_id', $table->id)
+                ->whereNull('paid_at')
+                ->get();
+
+            // 2️⃣ Remove only NON-completed items
+            OrderItem::whereIn('order_id', $orders->pluck('id'))
+                ->whereNotIn('status', [
+                    OrderItemStatus::Completed->value,
+                ])
+                ->delete();
+
+            // 2️⃣.1 Reset totals for affected orders
+            Order::whereIn('id', $orders->pluck('id'))
+                ->update([
+                    'subtotal' => 0,
+                    'discount' => 0,
+                    'tax' => 0,
+                    'total' => 0,
+                    'quantity' => 0,
+                ]);
+
+            // 3️⃣ Calculate totals (reuse your logic)
+            $subtotal = 0;
+            $totalQuantity = 0;
+
+            foreach ($validated['items'] as $itemData) {
+                $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
+
+                if ($menuItem->out_of_stock) {
+                    throw ValidationException::withMessages([
+                        'items' => ["{$menuItem->translations()->first()->name} is out of stock."],
+                    ]);
+                }
+
+                $price = $menuItem->variants()
+                    ->where('id', $itemData['variantId'] ?? null)
+                    ->value('price') ?? $menuItem->price ?? 0;
+
+                $subtotal += $price * $itemData['quantity'];
+                $totalQuantity += $itemData['quantity'];
+            }
+
+            $discount = $validated['discount'] ?? 0;
+            $vatRate = Branch::findOrFail(session(SessionKeys::CURRENT_BRANCH_ID))->tax ?? 0;
+            $tax = round(($subtotal - $discount) * ($vatRate / 100), 2);
+            $total = round($subtotal - $discount + $tax, 2);
+
+            // 4️⃣ Create a NEW order for replaced items
+            $order = Order::create([
+                'branch_id' => session(SessionKeys::CURRENT_BRANCH_ID),
+                'table_id' => $table->id,
+                'user_id' => request()->user()?->id,
+                'customer_ip' => request()->ip(),
+                'customer_user_agent' => request()->header('User-Agent'),
+                'notes' => $validated['notes'] ?? 'Updated by cashier',
+                'status' => OrderStatus::Pending->value,
+                'subtotal' => round($subtotal, 2),
+                'discount' => round($discount, 2),
+                'tax' => $tax,
+                'vat_rate' => $vatRate,
+                'total' => $total,
+                'quantity' => $totalQuantity,
+                'order_type' => $validated['orderType'],
+            ]);
+
+            // 5️⃣ Insert new order items
+            foreach ($validated['items'] as $itemData) {
+                $menuItem = MenuItem::findOrFail($itemData['menuItemId']);
+
+                $price = $menuItem->variants()
+                    ->where('id', $itemData['variantId'] ?? null)
+                    ->value('price') ?? $menuItem->price ?? 0;
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'menu_item_id' => $menuItem->id,
+                    'variant_id' => $itemData['variantId'] ?? null,
+                    'quantity' => $itemData['quantity'],
+                    'unit_price' => $price,
+                    'total_price' => $price * $itemData['quantity'],
+                    'notes' => $itemData['notes'] ?? null,
+                    'status' => OrderItemStatus::Pending->value,
+                ]);
+            }
+
+            OrderCreatedEvent::dispatch($order);
+        });
+
+        return back()->with('success', 'Order items updated successfully.');
+    }
 }

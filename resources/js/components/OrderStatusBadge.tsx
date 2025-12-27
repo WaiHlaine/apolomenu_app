@@ -5,7 +5,7 @@ export default function OrderStatusBadge({ status }: { status: string }) {
     if (status === 'pending') {
         badgeVariant = 'secondary';
     } else if (status === 'completed') {
-        badgeVariant = 'outline';
+        badgeVariant = 'default';
     } else if (status === 'cancelled') {
         badgeVariant = 'destructive';
     } else {

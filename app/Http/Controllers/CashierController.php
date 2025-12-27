@@ -63,6 +63,7 @@ class CashierController extends Controller
             'items.variant',
             'items.menuItem',
             'items.menuItem.translations',
+            'items.menuItem.variants',
         ])->where('table_id', $tableId)
             ->whereNull('paid_at')
             ->whereIn('id', $currentActiveTableOrders->pluck('id'))

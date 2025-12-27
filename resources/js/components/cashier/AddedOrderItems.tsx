@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge';
 import Price from '../common/Price';
 import { Button } from '../ui/button';
 
-export default function AddedOrderItems({ tableId, orderType }: { tableId?: string; orderType?: string }) {
+export default function AddedOrderItems({ tableId, orderType }: { tableId?: string; orderType?: string; orders?: OrderItem[] }) {
     const {
         branch,
         filters: { table },
@@ -22,6 +22,7 @@ export default function AddedOrderItems({ tableId, orderType }: { tableId?: stri
         table,
         orderType,
     });
+
     const { appearance } = useAppearance();
     const allOrders = useCashierOrderItemStore((store) => store.orders);
     const uniqueKey = `${branch.id}`;
@@ -81,7 +82,7 @@ export default function AddedOrderItems({ tableId, orderType }: { tableId?: stri
     };
 
     return (
-        <div className="relative max-h-[80vh] overflow-y-auto px-6">
+        <div className="relative h-[80vh] overflow-y-auto px-6">
             <div className="flex items-center justify-between border-b py-2">
                 <p className="text-sm font-semibold">Added items</p>
                 <Button onClick={handleClearOrder} variant={'outline'}>

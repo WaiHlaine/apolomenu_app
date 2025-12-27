@@ -11,7 +11,10 @@ Route::get('/{tenant_id}/{branch_id}/{table_public_token}/orders', [OrderControl
 Route::middleware(['auth', 'web', 'role:admin|cashier'])->group(function () {
     Route::post('/cancel-order/{order_id}', [OrderController::class, 'cancel'])->name('order.cancel');
     Route::post('/order-by-cashier', [OrderController::class, 'storeByCashier'])->name('order.storeByCashier');
-
+    Route::patch(
+        '/cashier/tables/{table}/replace-items',
+        [OrderController::class, 'replaceTableOrderItems']
+    )->name('cashier.tables.replace-items');
 });
 
 // user order route
